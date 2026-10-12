@@ -1,0 +1,818 @@
+{
+  "id": "ada9d07d-331e-4e12-b6b2-7e1ad2519acc",
+  "title": "Bengaluru trip",
+  "status": "insufficient_data",
+  "request": {
+    "origin": "Hyderabad",
+    "destination": "Bengaluru",
+    "start_date": "2026-10-13",
+    "end_date": "2026-10-17",
+    "travelers_count": 2,
+    "total_budget": "20000.00",
+    "currency": "INR",
+    "travel_style": "balanced",
+    "interests": [
+      "Culture",
+      "Food",
+      "Adventure"
+    ],
+    "constraints": {},
+    "cost_preferences": null
+  },
+  "total_estimated_cost": null,
+  "currency": "INR",
+  "created_at": "2026-10-12T15:54:58",
+  "updated_at": "2026-10-12T15:55:23",
+  "itinerary": null,
+  "budget": {
+    "total_budget": "20000.00",
+    "currency": "INR",
+    "known_cost_subtotal": "40058.00",
+    "estimated_total": null,
+    "remaining_budget": null,
+    "over_budget_amount": "20058.00",
+    "status": "OVER_BUDGET",
+    "minimum_estimated_total": null,
+    "maximum_estimated_total": null,
+    "estimate_confidence": "low",
+    "booking_readiness": "unverified",
+    "missing_price_actions": [
+      "intercity_transport: the configured reference registry has no coverage for this category in the destination country; supply an allowance or configure a dated reference/provider covering this destination, route and travel style.",
+      "contingency: price all base expenses to calculate the percentage reserve; it remains unknown until the subtotal is complete."
+    ],
+    "pricing_status": "INCOMPLETE",
+    "missing_price_inputs": [
+      "intercity_round_trip_fare_per_traveler"
+    ],
+    "line_items": [
+      {
+        "category": "accommodation",
+        "description": "Accommodation",
+        "amount": "11568.00",
+        "currency": "INR",
+        "classification": "estimated",
+        "source": "reference_data",
+        "pricing_basis": "Reference byt-in-balanced-accommodation-20261012: room_night allowance \u00d7 4; 5 inclusive day(s), 4 night(s), 2 traveler(s), 1 room(s).",
+        "assumptions": [
+          "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+          "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+          "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+          "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified.",
+          "Scenario bounds are planning allowances, not guaranteed market minimum/maximum or date-specific quotations."
+        ],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "planning_estimate",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "low",
+        "estimated_on": "2026-10-12",
+        "price_sources": [
+          {
+            "name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+            "url": "https://www.budgetyourtrip.com/india",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          },
+          {
+            "name": "Budget Your Trip spending-data methodology",
+            "url": "https://www.budgetyourtrip.com/howitworks.php",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          }
+        ],
+        "currency_conversion": null,
+        "comments": []
+      },
+      {
+        "category": "local_transport",
+        "description": "Local transport",
+        "amount": "5430.00",
+        "currency": "INR",
+        "classification": "estimated",
+        "source": "reference_data",
+        "pricing_basis": "Reference byt-in-balanced-local_transport-20261012: person_day allowance \u00d7 10; 5 inclusive day(s), 4 night(s), 2 traveler(s), 1 room(s).",
+        "assumptions": [
+          "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+          "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+          "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+          "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys.",
+          "Scenario bounds are planning allowances, not guaranteed market minimum/maximum or date-specific quotations."
+        ],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "planning_estimate",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "low",
+        "estimated_on": "2026-10-12",
+        "price_sources": [
+          {
+            "name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+            "url": "https://www.budgetyourtrip.com/india",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          },
+          {
+            "name": "Budget Your Trip spending-data methodology",
+            "url": "https://www.budgetyourtrip.com/howitworks.php",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          }
+        ],
+        "currency_conversion": null,
+        "comments": []
+      },
+      {
+        "category": "intercity_transport",
+        "description": "Intercity transport",
+        "amount": null,
+        "currency": "INR",
+        "classification": "unknown",
+        "source": "unknown",
+        "pricing_basis": null,
+        "assumptions": [],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "unknown",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "unassessed",
+        "estimated_on": "2026-10-12",
+        "price_sources": [],
+        "currency_conversion": null,
+        "comments": []
+      },
+      {
+        "category": "food",
+        "description": "Food",
+        "amount": "14340.00",
+        "currency": "INR",
+        "classification": "estimated",
+        "source": "reference_data",
+        "pricing_basis": "Reference byt-in-balanced-food-20261012: person_day allowance \u00d7 10; 5 inclusive day(s), 4 night(s), 2 traveler(s), 1 room(s).",
+        "assumptions": [
+          "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+          "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+          "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+          "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified.",
+          "Scenario bounds are planning allowances, not guaranteed market minimum/maximum or date-specific quotations."
+        ],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "planning_estimate",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "low",
+        "estimated_on": "2026-10-12",
+        "price_sources": [
+          {
+            "name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+            "url": "https://www.budgetyourtrip.com/india",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          },
+          {
+            "name": "Budget Your Trip spending-data methodology",
+            "url": "https://www.budgetyourtrip.com/howitworks.php",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          }
+        ],
+        "currency_conversion": null,
+        "comments": []
+      },
+      {
+        "category": "activities",
+        "description": "Activities",
+        "amount": "8720.00",
+        "currency": "INR",
+        "classification": "estimated",
+        "source": "reference_data",
+        "pricing_basis": "Reference byt-in-balanced-activities-20261012: person_day allowance \u00d7 10; 5 inclusive day(s), 4 night(s), 2 traveler(s), 1 room(s).",
+        "assumptions": [
+          "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+          "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+          "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+          "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review.",
+          "Scenario bounds are planning allowances, not guaranteed market minimum/maximum or date-specific quotations."
+        ],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "planning_estimate",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "low",
+        "estimated_on": "2026-10-12",
+        "price_sources": [
+          {
+            "name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+            "url": "https://www.budgetyourtrip.com/india",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          },
+          {
+            "name": "Budget Your Trip spending-data methodology",
+            "url": "https://www.budgetyourtrip.com/howitworks.php",
+            "observed_on": "2026-10-12",
+            "currency": "INR",
+            "published_on": null
+          }
+        ],
+        "currency_conversion": null,
+        "comments": []
+      },
+      {
+        "category": "contingency",
+        "description": "Contingency reserve",
+        "amount": null,
+        "currency": "INR",
+        "classification": "unknown",
+        "source": "unknown",
+        "pricing_basis": "Configured planning reserve percentage, not a provider price.",
+        "assumptions": [
+          "Default reserve is a transparent planning assumption; unknown components are not treated as zero.",
+          "Percentage is applied to all priced non-contingency components.",
+          "The percentage cannot be calculated until all cost components and currency are known."
+        ],
+        "source_references": [],
+        "optional": false,
+        "evidence_kind": "unknown",
+        "minimum_amount": null,
+        "maximum_amount": null,
+        "confidence": "low",
+        "estimated_on": "2026-10-12",
+        "price_sources": [],
+        "currency_conversion": null,
+        "comments": []
+      }
+    ],
+    "category_totals": [
+      {
+        "category": "accommodation",
+        "known_subtotal": "11568.00",
+        "currency": "INR",
+        "complete": true,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "local_transport",
+        "known_subtotal": "5430.00",
+        "currency": "INR",
+        "complete": true,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "intercity_transport",
+        "known_subtotal": "0.00",
+        "currency": "INR",
+        "complete": false,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "food",
+        "known_subtotal": "14340.00",
+        "currency": "INR",
+        "complete": true,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "activities",
+        "known_subtotal": "8720.00",
+        "currency": "INR",
+        "complete": true,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "contingency",
+        "known_subtotal": "0.00",
+        "currency": "INR",
+        "complete": false,
+        "included": true,
+        "line_item_count": 1
+      },
+      {
+        "category": "other",
+        "known_subtotal": "0.00",
+        "currency": "INR",
+        "complete": true,
+        "included": false,
+        "line_item_count": 0
+      }
+    ],
+    "unpriced_components": [
+      "intercity_transport: Intercity transport",
+      "contingency: Contingency reserve"
+    ],
+    "warnings": [
+      "Automatic reference allowances are non-live planning estimates. Reconfirm fares, hotel availability, tickets and exchange costs before booking; visa, insurance and premium experiences are excluded unless separately supplied.",
+      "intercity_transport: Intercity transport is unknown or unavailable in INR.",
+      "contingency: Contingency reserve is unknown or unavailable in INR.",
+      "Known priced expenses already exceed the total budget; additional unknown costs may increase the overage."
+    ],
+    "reduction_suggestions": [
+      {
+        "category": "food",
+        "recommendation": "Review food expenses for discretionary reductions; no savings are assumed.",
+        "estimated_savings": null,
+        "currency": "INR",
+        "pricing_basis": null,
+        "assumptions": [],
+        "source_references": []
+      },
+      {
+        "category": "accommodation",
+        "recommendation": "Compare budget hotels, hostels, or homestays; no alternative price is assumed.",
+        "estimated_savings": null,
+        "currency": "INR",
+        "pricing_basis": null,
+        "assumptions": [],
+        "source_references": []
+      },
+      {
+        "category": "activities",
+        "recommendation": "Review optional activities and consider removing or replacing some; savings are not assumed.",
+        "estimated_savings": null,
+        "currency": "INR",
+        "pricing_basis": null,
+        "assumptions": [],
+        "source_references": []
+      }
+    ],
+    "qualitative_summary": "The current planning estimates indicate that projected expenses exceed the financial limit. Several categories lack complete inputs, particularly intercity transport and contingency reserves, which means additional expenses have not yet been accounted for.",
+    "qualitative_tradeoffs": [
+      "Opting for simpler lodging arrangements could reduce overall expenses significantly.",
+      "Shifting from private to public transit options for local travel may lower transportation requirements.",
+      "Selecting more casual dining choices or self-catering can decrease daily meal expenditures.",
+      "Reducing the number of scheduled excursions and entertainment bookings will help scale back discretionary outlays.",
+      "Gathering definitive details for intercity transport and setting aside contingency funds will clarify total trip requirements."
+    ]
+  },
+  "optimization_review": {
+    "approved": false,
+    "review_status": "INSUFFICIENT_DATA"
+  },
+  "accommodation_transport": {
+    "destination_name": "Bengaluru, KA, India",
+    "origin_resolution_status": "verified_city",
+    "currency": "INR",
+    "source_references": [
+      {
+        "provider": "tavily",
+        "title": "KARNATAKA TRADE PROMOTION ORGANIZATION - Bangalore-attractions",
+        "url": "https://ktpo.karnataka.gov.in/13/bangalore-attractions/en",
+        "topic": "attractions",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "List of tourist attractions in Bengaluru - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/List_of_tourist_attractions_in_Bengaluru",
+        "topic": "attractions",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "52 Best Places to visit in Bangalore | Top Tourist Attractions | 2026",
+        "url": "https://www.holidify.com/places/bangalore/sightseeing-and-things-to-do.html",
+        "topic": "attractions",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "THE 15 BEST Things to Do in Bengaluru (2026) - Must-See Attractions",
+        "url": "https://www.tripadvisor.com/Attractions-g297628-Activities-Bengaluru_Bangalore_District_Karnataka.html",
+        "topic": "attractions",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Instagram",
+        "url": "https://www.instagram.com/reel/DL9BLIphdxj?hl=en",
+        "topic": "history",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Heritage Places in Bengaluru: Discovering the City\u2019s Living History with Make It Happen - Make It Happen",
+        "url": "https://makeithappen.co.in/heritage-places-in-bengaluru-discovering-the-citys-living-history-with-make-it-happen",
+        "topic": "history",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Top 5 Historic Places in Bengaluru | Taj Hotels",
+        "url": "https://www.tajhotels.com/en-in/blog/travel-inspiration/historic-places-in-bengaluru",
+        "topic": "history",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "THE 10 BEST Bengaluru Sights & Historical Landmarks to Visit (2026)",
+        "url": "https://www.tripadvisor.com/Attractions-g297628-Activities-c47-Bengaluru_Bangalore_District_Karnataka.html",
+        "topic": "history",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "The delectable cuisine of Karnataka \u2013 13 must try local dishes in Bengaluru",
+        "url": "https://www.incredibleindia.gov.in/en/karnataka/bengaluru/the-delectable-cuisine-of-karnataka-13-must-try-local-dishes-in-bengaluru",
+        "topic": "food",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Traditional Food in Bangalore: A Journey Through the City\u2019s Culinary Heritage - Make It Happen",
+        "url": "https://makeithappen.co.in/temples-in-north-goa-exploring-sacred-landscapes-living-traditions-and-cultural-heritage-2",
+        "topic": "food",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Best things to eat in Bengaluru and where to eat them | Cathay US",
+        "url": "https://www.cathaypacific.com/cx/en_US/inspiration/dining/best-things-to-eat-bengaluru.html",
+        "topic": "food",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "THE 10 BEST Local Eats in Bengaluru (UPDATED 2026) - Tripadvisor",
+        "url": "https://www.tripadvisor.com/Restaurants-g297628-zft10613-Bengaluru_Bangalore_District_Karnataka.html",
+        "topic": "food",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bangalore Travel Guide | Insider tips, hidden gems, itineraries and more",
+        "url": "https://www.getyourguide.com/explorer/bangalore-ttd313",
+        "topic": "travel_tips",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bengaluru travel and food guide",
+        "url": "https://www.incredibleindia.gov.in/en/karnataka/bengaluru/bengaluru-travel-and-food-guide",
+        "topic": "travel_tips",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bengaluru Travel Guide: Temples, Gardens, and Savory Dosa Delights - Faces Places and Plates",
+        "url": "https://www.facesplacesandplates.com/bengaluru-travel-guide",
+        "topic": "travel_tips",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bengaluru, India: All You Must Know Before You Go (2026) - Tripadvisor",
+        "url": "https://www.tripadvisor.com/Tourism-g297628-Bengaluru_Bangalore_District_Karnataka-Vacations.html",
+        "topic": "travel_tips",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bangalore (Bengaluru) | India Travel Guide | Rough Guides",
+        "url": "https://www.roughguides.com/india/karnataka/bengaluru-bangalore-around",
+        "topic": "seasonal",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "Bengaluru Travel Guide: Things to Do & Best Time to Visit | RwandAir",
+        "url": "https://www.rwandair.com/destinations/bengaluru",
+        "topic": "seasonal",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "A guide to seasonal travel in India: Winter, Spring & Summer | The Leela Palaces Hotels and Resorts",
+        "url": "https://www.theleela.com/travel-diaries/a-guide-seasonal-travel-india-winter-spring-summer",
+        "topic": "seasonal",
+        "content_is_untrusted": true
+      },
+      {
+        "provider": "tavily",
+        "title": "India Travel Guide: Best Places to Visit Month by Month",
+        "url": "https://www.onthegotours.com/India/Guides/Month-By-Month-in-India",
+        "topic": "seasonal",
+        "content_is_untrusted": true
+      }
+    ],
+    "number_of_nights": 4,
+    "accommodation": {
+      "recommended_types": [
+        "mid_range_hotel",
+        "budget_hotel"
+      ],
+      "stay_area_suggestions": [],
+      "room_count": 1,
+      "nights": 4,
+      "assumed_occupancy_per_room": 2,
+      "estimated_nightly_rate": {
+        "amount": null,
+        "currency": "INR",
+        "classification": "unknown",
+        "pricing_basis": null,
+        "assumptions": [],
+        "uncertainty_notes": [
+          "No grounded accommodation price assumption was supplied."
+        ]
+      },
+      "estimated_total_cost": {
+        "amount": null,
+        "currency": "INR",
+        "classification": "unknown",
+        "pricing_basis": null,
+        "assumptions": [],
+        "uncertainty_notes": [
+          "No complete, explicit accommodation pricing basis and currency are available."
+        ]
+      },
+      "live_availability_checked": false,
+      "assumptions": [
+        "Room count assumes a maximum of 2 travelers per room; actual accommodation occupancy rules vary."
+      ]
+    },
+    "transport_options": [
+      {
+        "mode": "walking",
+        "recommendation_reason": "Convenient for exploring nearby parks and central landmarks within the verified areas.",
+        "supported_by_routing_provider": true,
+        "live_availability_checked": false,
+        "route_estimate": null,
+        "estimated_cost": {
+          "amount": null,
+          "currency": "INR",
+          "classification": "unknown",
+          "pricing_basis": null,
+          "assumptions": [],
+          "uncertainty_notes": [
+            "No explicit transport price assumption."
+          ]
+        }
+      },
+      {
+        "mode": "local_transit",
+        "recommendation_reason": "Useful for navigating between different central points and surrounding neighborhoods in Bengaluru. No live local_transit schedules, availability, or fares are provided.",
+        "supported_by_routing_provider": false,
+        "live_availability_checked": false,
+        "route_estimate": null,
+        "estimated_cost": {
+          "amount": null,
+          "currency": "INR",
+          "classification": "unknown",
+          "pricing_basis": null,
+          "assumptions": [],
+          "uncertainty_notes": [
+            "No explicit local_transport_total pricing assumption was supplied."
+          ]
+        }
+      }
+    ],
+    "accommodation_cost": {
+      "amount": null,
+      "currency": "INR",
+      "classification": "unknown",
+      "pricing_basis": null,
+      "assumptions": [],
+      "uncertainty_notes": [
+        "No complete, explicit accommodation pricing basis and currency are available."
+      ]
+    },
+    "local_transport_cost": {
+      "amount": null,
+      "currency": "INR",
+      "classification": "unknown",
+      "pricing_basis": null,
+      "assumptions": [],
+      "uncertainty_notes": [
+        "No explicit local_transport_total pricing assumption was supplied."
+      ]
+    },
+    "intercity_transport_cost": {
+      "amount": null,
+      "currency": "INR",
+      "classification": "unknown",
+      "pricing_basis": null,
+      "assumptions": [],
+      "uncertainty_notes": [
+        "No explicit intercity_transport_total pricing assumption was supplied."
+      ]
+    },
+    "combined_estimated_cost": {
+      "amount": null,
+      "currency": "INR",
+      "classification": "unknown",
+      "pricing_basis": null,
+      "assumptions": [],
+      "uncertainty_notes": [
+        "Combined total is unknown because one or more components are unpriced."
+      ]
+    },
+    "unpriced_components": [
+      "accommodation",
+      "local_transport",
+      "intercity_transport"
+    ],
+    "assumptions": [
+      "Room count assumes a maximum of 2 travelers per room; actual accommodation occupancy rules vary."
+    ],
+    "warnings": [
+      "Gemini stay-area suggestions were discarded because they were not present in destination research.",
+      "Accommodation price is unknown at the accommodation research stage; the Budget Agent will attempt supported planning estimates. No live hotel price was invented.",
+      "Origin-to-destination road routing was skipped for the selected transport mode; no flight, rail or bus duration was assumed.",
+      "Local transport cost is unknown at the accommodation research stage; the Budget Agent will attempt supported planning estimates. No live fare was invented.",
+      "Intercity transport cost is unknown at the accommodation research stage; the Budget Agent will attempt supported planning estimates. No live flight/train/bus fare was invented."
+    ]
+  },
+  "normalized_requirements": null,
+  "destination_research": null,
+  "days": [
+    {
+      "day_number": 1,
+      "itinerary_date": "2026-10-13",
+      "summary": "Cultural Landmarks and Heritage [daily cost estimate unknown]",
+      "estimated_daily_cost": null,
+      "activities": [
+        {
+          "title": "Arrival and settling-in buffer",
+          "description": "Planning buffer only; confirm actual arrival and transfer times.",
+          "location_name": null,
+          "start_time": "08:00:00",
+          "end_time": "08:30:00",
+          "estimated_cost": null,
+          "category": "arrival_departure",
+          "metadata": {
+            "activity_type": "arrival_departure",
+            "place_id": null,
+            "latitude": null,
+            "longitude": null,
+            "coordinates_verified": false,
+            "travel_time_from_previous_minutes": null,
+            "travel_time_verified": false,
+            "travel_time_provider": null,
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Timing is a planning placeholder, not a verified schedule."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        },
+        {
+          "title": "Mahatma Gandhi",
+          "description": "Visit the provider-listed place Mahatma Gandhi. Confirm current opening hours before departure.",
+          "location_name": "Mahatma Gandhi, Doctor B R Ambedkar Veedhi, Sampangirama Nagar, Bengaluru - 560001, Karnataka, India",
+          "start_time": "09:00:00",
+          "end_time": "10:30:00",
+          "estimated_cost": null,
+          "category": "attraction",
+          "metadata": {
+            "activity_type": "attraction",
+            "place_id": "517cc6cf90bb65534059c949720a3cf52940f00103f90182c5774a0200000092030e4d616861746d612047616e646869",
+            "latitude": 12.9789737,
+            "longitude": 77.5895731,
+            "coordinates_verified": true,
+            "travel_time_from_previous_minutes": null,
+            "travel_time_verified": false,
+            "travel_time_provider": null,
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Estimated visit duration; opening hours were not verified."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        },
+        {
+          "title": "Meal break",
+          "description": "Flexible meal break; meal availability and price are not verified.",
+          "location_name": null,
+          "start_time": "12:00:00",
+          "end_time": "12:45:00",
+          "estimated_cost": null,
+          "category": "meal_break",
+          "metadata": {
+            "activity_type": "meal_break",
+            "place_id": null,
+            "latitude": null,
+            "longitude": null,
+            "coordinates_verified": false,
+            "travel_time_from_previous_minutes": null,
+            "travel_time_verified": false,
+            "travel_time_provider": null,
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Timing is a planning placeholder, not a verified schedule."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        },
+        {
+          "title": "Jawaharlal Nehru",
+          "description": "Visit the provider-listed place Jawaharlal Nehru. Confirm current opening hours before departure.",
+          "location_name": "Jawaharlal Nehru, Doctor B R Ambedkar Veedhi, Sampangirama Nagar, Bengaluru - 560001, Karnataka, India",
+          "start_time": "12:45:00",
+          "end_time": "14:15:00",
+          "estimated_cost": null,
+          "category": "attraction",
+          "metadata": {
+            "activity_type": "attraction",
+            "place_id": "51f9abb651d365534059f8cb82e4f8f42940f00103f901c76e6ba0020000009203104a6177616861726c616c204e65687275",
+            "latitude": 12.9784614,
+            "longitude": 77.5910229,
+            "coordinates_verified": true,
+            "travel_time_from_previous_minutes": "12.03",
+            "travel_time_verified": true,
+            "travel_time_provider": "openrouteservice",
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Estimated visit duration; opening hours were not verified."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        },
+        {
+          "title": "Nadaprabhu Sri Kempegowda",
+          "description": "Visit the provider-listed place Nadaprabhu Sri Kempegowda. Confirm current opening hours before departure.",
+          "location_name": "Nadaprabhu Sri Kempegowda, Doctor B R Ambedkar Veedhi, Sampangirama Nagar, Bengaluru - 560001, Karnataka, India",
+          "start_time": "14:30:00",
+          "end_time": "16:00:00",
+          "estimated_cost": null,
+          "category": "attraction",
+          "metadata": {
+            "activity_type": "attraction",
+            "place_id": "51fd9efdedd7655340596eafbb2f1df52940f00103f901c16e6ba0020000009203194e61646170726162687520537269204b656d7065676f776461",
+            "latitude": 12.9787383,
+            "longitude": 77.5913043,
+            "coordinates_verified": true,
+            "travel_time_from_previous_minutes": "0.77",
+            "travel_time_verified": true,
+            "travel_time_provider": "openrouteservice",
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Estimated visit duration; opening hours were not verified."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        },
+        {
+          "title": "Rest period",
+          "description": "Flexible rest period; adjust around confirmed local travel times.",
+          "location_name": null,
+          "start_time": "16:15:00",
+          "end_time": "16:45:00",
+          "estimated_cost": null,
+          "category": "rest",
+          "metadata": {
+            "activity_type": "rest",
+            "place_id": null,
+            "latitude": null,
+            "longitude": null,
+            "coordinates_verified": false,
+            "travel_time_from_previous_minutes": null,
+            "travel_time_verified": false,
+            "travel_time_provider": null,
+            "cost_currency": null,
+            "cost_classification": "unknown",
+            "source_references": [],
+            "warnings": [
+              "Timing is a planning placeholder, not a verified schedule."
+            ],
+            "estimated_cost_unknown": true,
+            "intercity_transfer": null
+          }
+        }
+      ]
+    }
+  ],
+  "warnings": [],
+  "errors": [
+    "Required costs are incomplete or unpriced; affordability cannot be approved."
+  ]
+}

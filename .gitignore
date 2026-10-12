@@ -1,0 +1,41 @@
+# Environment files (keep committed examples)
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.pytest-tmp/
+automatic_estimation_live_check.jsonl
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# Build and test outputs
+dist/
+build/
+coverage/
+.coverage
+*.tsbuildinfo
+
+# Local secrets and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.*
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

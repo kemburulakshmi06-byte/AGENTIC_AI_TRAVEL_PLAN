@@ -1,0 +1,10 @@
+{
+  "origin": "India",
+  "destination": "Japan",
+  "start_date": "2026-10-14",
+  "end_date": "2026-10-27",
+  "travelers_count": 1,
+  "currency": "USD",
+  "total_budget": "100000.00",
+  "interests": ["Food", "Nature", "Culture"]
+}

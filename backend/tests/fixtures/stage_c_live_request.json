@@ -1,0 +1,12 @@
+{
+  "origin": "Hyderabad",
+  "destination": "Tokyo, Japan",
+  "start_date": "2026-10-15",
+  "end_date": "2026-10-16",
+  "travelers_count": 2,
+  "total_budget": "200000.00",
+  "currency": "INR",
+  "interests": ["history"],
+  "cost_preferences": {"transport_mode": "flight"},
+  "user_message": "Plan a trip from Hyderabad to Tokyo, Japan for 2 travelers from October 15, 2026 to October 16, 2026, with a total budget of INR 200000 and an interest in history. Prices have not been supplied; do not invent them."
+}

@@ -1,0 +1,1258 @@
+{
+  "version": 1,
+  "style_aliases": {
+    "balanced": "balanced",
+    "comfort": "balanced",
+    "comfortable": "balanced",
+    "relaxed": "balanced",
+    "adventure": "balanced",
+    "adventurous": "balanced",
+    "budget": "budget",
+    "economy": "budget",
+    "backpacker": "budget",
+    "luxury": "luxury",
+    "premium": "luxury"
+  },
+  "rates": [
+    {
+      "id": "jnto-double-room-budget",
+      "category": "accommodation",
+      "country_code": "jp",
+      "styles": [
+        "budget"
+      ],
+      "unit": "room_night",
+      "occupancy": 2,
+      "currency": "JPY",
+      "minimum": "10000",
+      "typical": "12500",
+      "maximum": "15000",
+      "confidence": "low",
+      "source_name": "JNTO budget guide: double-room reference",
+      "source_url": "https://www.japan.travel/en/guide/japan-on-a-budget/",
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Double rooms use the guide's midrange starting point of JPY 10000, not its single-room price. Typical and upper allowances use explicit 1.25 and 1.5 planning factors; neither is an observed hotel quote.",
+        "Two adults per room. Accommodation taxes, peak dates and specific hotel standards require confirmation."
+      ]
+    },
+    {
+      "id": "jnto-double-room-balanced",
+      "category": "accommodation",
+      "country_code": "jp",
+      "styles": [
+        "balanced"
+      ],
+      "unit": "room_night",
+      "occupancy": 2,
+      "currency": "JPY",
+      "minimum": "10000",
+      "typical": "20000",
+      "maximum": "30000",
+      "confidence": "low",
+      "source_name": "JNTO budget guide: midrange/four-star double-room references",
+      "source_url": "https://www.japan.travel/en/guide/japan-on-a-budget/",
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Scenario allowances span guide starting points for midrange and four-star double rooms; the midpoint is a planning assumption, not a market average.",
+        "Two adults per room. No property availability or date-specific hotel rate is asserted."
+      ]
+    },
+    {
+      "id": "jnto-double-room-premium",
+      "category": "accommodation",
+      "country_code": "jp",
+      "styles": [
+        "luxury"
+      ],
+      "unit": "room_night",
+      "occupancy": 2,
+      "currency": "JPY",
+      "minimum": "30000",
+      "typical": "40000",
+      "maximum": "60000",
+      "confidence": "low",
+      "source_name": "JNTO budget guide: four/five-star double-room references",
+      "source_url": "https://www.japan.travel/en/guide/japan-on-a-budget/",
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Guide starting points anchor the lower and typical allowances. Upper allowance adds an explicit 50 percent planning margin to the five-star starting point; it is not a quoted ceiling.",
+        "Two adults per room. Premium dining and private transfers need separate supported allowances."
+      ]
+    },
+    {
+      "id": "jnto-casual-food",
+      "category": "food",
+      "country_code": "jp",
+      "styles": [
+        "budget",
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "JPY",
+      "minimum": "1810",
+      "typical": "3260",
+      "maximum": "4710",
+      "confidence": "low",
+      "source_name": "JNTO budget guide: casual meal anchors",
+      "source_url": "https://www.japan.travel/en/guide/japan-on-a-budget/",
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Model per person per day: breakfast 400/550/700 + two meals at 650/1300/1950 + water 110. Lunch/dinner multiples of the casual-meal anchor are transparent planning assumptions.",
+        "No alcohol, fine dining or dietary surcharge is priced. All travelers use adult allowances."
+      ]
+    },
+    {
+      "id": "tokyo-public-transport",
+      "category": "local_transport",
+      "country_code": "jp",
+      "destination_cities": [
+        "Tokyo"
+      ],
+      "styles": [
+        "budget",
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "JPY",
+      "minimum": "1000",
+      "typical": "1250",
+      "maximum": "1500",
+      "fixed_per_person_trip": "6400",
+      "confidence": "low",
+      "source_name": "Tokyo Metro adult day ticket; airport allowance anchored in JNTO guide",
+      "source_url": "https://www.tokyometro.jp/en/ticket/travel/index.html",
+      "additional_sources": [
+        {
+          "name": "JNTO airport-transfer reference",
+          "url": "https://www.japan.travel/en/guide/japan-on-a-budget/",
+          "observed_on": "2026-10-11",
+          "currency": "JPY"
+        }
+      ],
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Public subway travel uses a daily adult-ticket anchor with 25/50 percent planning margins. Daily ticket purchase is assumed instead of optimizing pass durations.",
+        "Includes a fixed JPY 6400 per traveler airport-transfer reserve (two JPY 3200 guide examples, https://www.japan.travel/en/guide/japan-on-a-budget/). Actual airport, eligibility and transfers require confirmation; no airport or route is selected here.",
+        "Taxis, private transfers and travel outside the city are not covered by this public-transport model."
+      ]
+    },
+    {
+      "id": "tokyo-culture-activity-allowance",
+      "category": "activities",
+      "country_code": "jp",
+      "destination_cities": [
+        "Tokyo"
+      ],
+      "styles": [
+        "budget",
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "JPY",
+      "minimum": "1000",
+      "typical": "2000",
+      "maximum": "3000",
+      "confidence": "low",
+      "source_name": "Tokyo National Museum adult collection-admission reference",
+      "source_url": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+      "observed_on": "2026-10-11",
+      "valid_until": "2027-01-09",
+      "assumptions": [
+        "Daily activity allowance is one/two/three collection-admission equivalents; it does not imply visiting this museum or quote tickets for the actual selected attractions.",
+        "Ordinary sightseeing only. Theme parks, guided tours, special exhibitions and premium experiences need matching references or a separate user allowance."
+      ]
+    },
+    {
+      "id": "jal-hyd-tokyo-fare-snapshot",
+      "category": "intercity_transport",
+      "country_code": "jp",
+      "destination_cities": [
+        "Tokyo"
+      ],
+      "origins": [
+        "Hyderabad",
+        "Hyderabad, India"
+      ],
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "108028",
+      "typical": "128532",
+      "maximum": "192798",
+      "confidence": "low",
+      "source_name": "JAL advertised economy round-trip snapshot, not a trip-date quote",
+      "source_url": "https://www.jal.co.jp/flights/en-in/flights-from-hyderabad",
+      "observed_on": "2026-10-11",
+      "valid_until": "2026-11-10",
+      "assumptions": [
+        "Public examples observed: INR 108028 for February 22-28, 2027 and INR 128532 for January 14-26, 2027. These are different dates from the requested trip and may be unavailable.",
+        "Typical uses the higher observed example; upper adds an explicit 50 percent planning margin. Neither is an actual-date fare or statistical market range.",
+        "Adult economy round trip even for a luxury stay style. Optional baggage, origin-airport access and business-class upgrades are excluded."
+      ]
+    },
+    {
+      "id": "ana-mumbai-tokyo-fare-snapshot",
+      "category": "intercity_transport",
+      "country_code": "jp",
+      "destination_cities": [
+        "Tokyo"
+      ],
+      "origins": [
+        "Mumbai",
+        "Mumbai, India"
+      ],
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "58974",
+      "typical": "58985",
+      "maximum": "114651",
+      "confidence": "low",
+      "source_name": "ANA advertised economy round-trip examples, not trip-date quotes",
+      "source_url": "https://flights.ana.co.jp/en-in/flights-from-india-to-japan",
+      "observed_on": "2026-10-11",
+      "valid_until": "2026-11-10",
+      "assumptions": [
+        "Examples span December 24, 2026-January 2, 2027 (Narita) through February 22-26, 2027 (Haneda). Typical uses a Narita example; airport/date differences explain the broad range.",
+        "Adult economy round trip; dates, airport selection, availability and ancillary fees are unverified. This is not a market ceiling."
+      ]
+    },
+    {
+      "id": "ana-delhi-tokyo-fare-snapshot",
+      "category": "intercity_transport",
+      "country_code": "jp",
+      "destination_cities": [
+        "Tokyo"
+      ],
+      "origins": [
+        "Delhi",
+        "New Delhi",
+        "Delhi, India",
+        "New Delhi, India"
+      ],
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "64575",
+      "typical": "64585",
+      "maximum": "96877.50",
+      "confidence": "low",
+      "source_name": "ANA advertised economy round-trip examples, not trip-date quotes",
+      "source_url": "https://flights.ana.co.jp/en-in/flights-from-india-to-japan",
+      "observed_on": "2026-10-11",
+      "valid_until": "2026-11-10",
+      "assumptions": [
+        "Examples observed for November 11-24 and December 21, 2026-January 5, 2027. Upper adds an explicit 50 percent planning margin; it is not a provider maximum.",
+        "Adult economy round trip; different requested dates can cost more. No booking availability or ancillary fees are verified."
+      ]
+    },
+    {
+      "id": "ana-mumbai-osaka-fare-snapshot",
+      "category": "intercity_transport",
+      "country_code": "jp",
+      "destination_cities": [
+        "Osaka"
+      ],
+      "origins": [
+        "Mumbai",
+        "Mumbai, India"
+      ],
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "59470",
+      "typical": "59996",
+      "maximum": "89994",
+      "confidence": "low",
+      "source_name": "ANA advertised economy round-trip examples, not trip-date quotes",
+      "source_url": "https://flights.ana.co.jp/en-in/flights-from-india-to-japan",
+      "observed_on": "2026-10-11",
+      "valid_until": "2026-11-10",
+      "assumptions": [
+        "Examples observed for November 22-December 5, 2026 and January 22-26, 2027. Upper adds an explicit 50 percent planning margin; it is not a provider maximum.",
+        "Adult economy round trip. Actual requested dates, airports, availability and ancillary fees remain unverified."
+      ]
+    },
+    {
+      "id": "byt-in-budget-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "budget"
+      ],
+      "unit": "room_night",
+      "currency": "INR",
+      "minimum": "1126",
+      "typical": "1126",
+      "maximum": "1126",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-budget-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "196",
+      "typical": "196",
+      "maximum": "196",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-in-budget-food-20261012",
+      "category": "food",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "560",
+      "typical": "560",
+      "maximum": "560",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-budget-activities-20261012",
+      "category": "activities",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "323",
+      "typical": "323",
+      "maximum": "323",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "byt-in-balanced-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "room_night",
+      "currency": "INR",
+      "minimum": "2892",
+      "typical": "2892",
+      "maximum": "2892",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-balanced-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "543",
+      "typical": "543",
+      "maximum": "543",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-in-balanced-food-20261012",
+      "category": "food",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "1434",
+      "typical": "1434",
+      "maximum": "1434",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-balanced-activities-20261012",
+      "category": "activities",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "872",
+      "typical": "872",
+      "maximum": "872",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "byt-in-luxury-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "room_night",
+      "currency": "INR",
+      "minimum": "7546",
+      "typical": "7546",
+      "maximum": "7546",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-luxury-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "1638",
+      "typical": "1638",
+      "maximum": "1638",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-in-luxury-food-20261012",
+      "category": "food",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "3716",
+      "typical": "3716",
+      "maximum": "3716",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-in-luxury-activities-20261012",
+      "category": "activities",
+      "country_code": "in",
+      "destination_cities": [],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "INR",
+      "minimum": "2515",
+      "typical": "2515",
+      "maximum": "2515",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/india",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-07-03, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "India national average is a broad regional planning assumption; actual city, season, taxes and traveler choices can differ.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "byt-ae-budget-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "budget"
+      ],
+      "unit": "room_night",
+      "currency": "AED",
+      "minimum": "480",
+      "typical": "480",
+      "maximum": "480",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-budget-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "16",
+      "typical": "16",
+      "maximum": "16",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-ae-budget-food-20261012",
+      "category": "food",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "142",
+      "typical": "142",
+      "maximum": "142",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-budget-activities-20261012",
+      "category": "activities",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "budget"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "21",
+      "typical": "21",
+      "maximum": "21",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "budget maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "byt-ae-balanced-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "room_night",
+      "currency": "AED",
+      "minimum": "1247",
+      "typical": "1247",
+      "maximum": "1247",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-balanced-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "47",
+      "typical": "47",
+      "maximum": "47",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-ae-balanced-food-20261012",
+      "category": "food",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "354",
+      "typical": "354",
+      "maximum": "354",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-balanced-activities-20261012",
+      "category": "activities",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "balanced"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "70",
+      "typical": "70",
+      "maximum": "70",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "balanced maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "byt-ae-luxury-accommodation-20261012",
+      "category": "accommodation",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "room_night",
+      "currency": "AED",
+      "minimum": "3352",
+      "typical": "3352",
+      "maximum": "3352",
+      "range_supported": false,
+      "occupancy": 2,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Double-occupancy room allowance: published room average for mid-range; otherwise twice the reported per-person room share. Requires room capacity of two; multiplied by rooms and nights, not traveler-days. Taxes and requested-date availability are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-luxury-local_transport-20261012",
+      "category": "local_transport",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "159",
+      "typical": "159",
+      "maximum": "159",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Reported daily spending per traveler; multiply by travelers and inclusive trip days. Local transport excludes intercity and origin-to-destination journeys."
+      ]
+    },
+    {
+      "id": "byt-ae-luxury-food-20261012",
+      "category": "food",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "863",
+      "typical": "863",
+      "maximum": "863",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Daily meal spending per traveler; restaurant availability and individual meal prices are unverified."
+      ]
+    },
+    {
+      "id": "byt-ae-luxury-activities-20261012",
+      "category": "activities",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "styles": [
+        "luxury"
+      ],
+      "unit": "person_day",
+      "currency": "AED",
+      "minimum": "281",
+      "typical": "281",
+      "maximum": "281",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Budget Your Trip historical traveler-reported spending (planning allowance)",
+      "source_url": "https://www.budgetyourtrip.com/united-arab-emirates/dubai",
+      "additional_sources": [
+        {
+          "name": "Budget Your Trip spending-data methodology",
+          "url": "https://www.budgetyourtrip.com/howitworks.php",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2027-01-10",
+      "assumptions": [
+        "Historical traveler-reported spending; source last updated 2026-08-24, reviewed 2026-10-12. Not a live price or booking availability check.",
+        "Dubai city spending average; no coverage for other UAE cities.",
+        "luxury maps to the source budget/mid-range/luxury spending group. No statistically supported uncertainty interval is published; only a point estimate is supplied.",
+        "Planning assumption: one average entertainment purchase per traveler per day. This is a spending allowance, not a ticket price for selected attractions; free days, premium tours and specific required tickets need review."
+      ]
+    },
+    {
+      "id": "aix-hyd-blr-20261013-20261017-snapshot",
+      "category": "intercity_transport",
+      "country_code": "in",
+      "destination_cities": [
+        "Bengaluru",
+        "Bangalore"
+      ],
+      "origins": [
+        "Hyderabad",
+        "Hyderabad, India"
+      ],
+      "departure_date": "2026-10-13",
+      "return_date": "2026-10-17",
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "15487",
+      "typical": "15487",
+      "maximum": "15487",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Air India Express requested-date advertised starting-fare snapshot (HYD-BLR outbound)",
+      "source_url": "https://www.airindiaexpress.com/en-in/book-flights/hyderabad-to-bengaluru-flights",
+      "additional_sources": [
+        {
+          "name": "Air India Express requested-date advertised starting-fare snapshot (BLR-HYD return)",
+          "url": "https://www.airindiaexpress.com/en-in/book-flights/bengaluru-to-hyderabad-flights",
+          "observed_on": "2026-10-12",
+          "currency": "INR"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2026-10-12",
+      "assumptions": [
+        "Point allowance sums advertised adult economy starting fares observed 2026-10-12 for HYD-BLR on 2026-10-13 (INR 4,940) and BLR-HYD on 2026-10-17 (INR 10,547).",
+        "The provider states that displayed fares were collected within the previous 48 hours and may no longer be available. Values changed during review, so this is a low-confidence historical planning snapshot, not a live quote or availability confirmation.",
+        "Optional products, airport access, fare changes and traveler-specific charges may be additional. The allowance applies only to this exact route and date pair and is multiplied by the traveler count."
+      ]
+    },
+    {
+      "id": "aix-hyd-dxb-20261020-20261024-snapshot",
+      "category": "intercity_transport",
+      "country_code": "ae",
+      "destination_cities": [
+        "Dubai"
+      ],
+      "origins": [
+        "Hyderabad",
+        "Hyderabad, India"
+      ],
+      "departure_date": "2026-10-20",
+      "return_date": "2026-10-24",
+      "styles": [
+        "budget",
+        "balanced",
+        "luxury"
+      ],
+      "transport_modes": [
+        "flight"
+      ],
+      "unit": "person_trip",
+      "currency": "INR",
+      "minimum": "31120.83",
+      "typical": "31120.83",
+      "maximum": "31120.83",
+      "range_supported": false,
+      "confidence": "low",
+      "source_name": "Air India Express requested-date advertised starting-fare snapshot (HYD-DXB outbound)",
+      "source_url": "https://www.airindiaexpress.com/en-in/book-flights/hyderabad-to-dubai-flights",
+      "additional_sources": [
+        {
+          "name": "Air India Express requested-date advertised starting-fare snapshot (DXB-HYD return)",
+          "url": "https://www.airindiaexpress.com/en-ae/book-flights/dubai-to-hyderabad-flights",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        },
+        {
+          "name": "Central Bank of the UAE exchange rates against AED for VAT-related obligations",
+          "url": "https://centralbank.ae/umbraco/Surface/Exchange/GetExchangeRateAllCurrency",
+          "observed_on": "2026-10-12",
+          "currency": "AED"
+        }
+      ],
+      "observed_on": "2026-10-12",
+      "valid_until": "2026-10-12",
+      "assumptions": [
+        "Point allowance uses advertised adult economy starting fares observed 2026-10-12 for HYD-DXB on 2026-10-20 (INR 15,004) and DXB-HYD on 2026-10-24 (AED 618).",
+        "The return fare is converted deterministically with the Central Bank of the UAE 2026-10-12 VAT reference rate of AED 0.038345 per INR: AED 618 / 0.038345 = INR 16,116.83 after ROUND_HALF_UP to two decimals. The per-person round-trip point allowance is therefore INR 31,120.83.",
+        "The central-bank table is a dated reference conversion, not a retail card/cash exchange quote. No conversion spread, fee or later exchange-rate movement is represented.",
+        "The airline states that displayed fares were collected within the previous 48 hours and may no longer be available. This is a low-confidence historical planning snapshot, not a live quote or availability confirmation.",
+        "Optional products, airport access, fare changes and traveler-specific charges may be additional. The allowance applies only to this exact route and date pair and is multiplied by the traveler count."
+      ]
+    }
+  ]
+}

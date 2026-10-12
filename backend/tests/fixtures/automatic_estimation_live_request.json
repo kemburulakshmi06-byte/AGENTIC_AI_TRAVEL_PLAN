@@ -1,0 +1,11 @@
+{
+  "origin": "Hyderabad",
+  "destination": "Tokyo",
+  "start_date": "2026-10-15",
+  "end_date": "2026-10-19",
+  "travelers_count": 2,
+  "total_budget": "250000.00",
+  "currency": "INR",
+  "travel_style": "balanced",
+  "interests": ["Culture", "Food", "Nature"]
+}
