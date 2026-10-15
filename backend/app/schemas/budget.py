@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, HttpUrl, field_validator, model_validator
 
 from .agent_schemas import AgentSchema
 from .destination_research import SourceReference
+from .flight_pricing import CachedFlightReference
 
 BudgetCategory = Literal[
     "accommodation",
@@ -73,6 +74,10 @@ class BudgetLineItem(AgentSchema):
     estimated_on: date = Field(default_factory=date.today)
     price_sources: list[PriceSource] = Field(default_factory=list)
     currency_conversion: CurrencyConversion | None = None
+    flight_reference: CachedFlightReference | None = None
+    # Additive metadata; absent on older saved budgets. Validated with the
+    # foundation contract lazily to avoid circular schema imports.
+    ai_provenance: dict[str, Any] | None = None
 
     @field_validator("currency")
     @classmethod
@@ -86,6 +91,11 @@ class BudgetLineItem(AgentSchema):
 
     @model_validator(mode="after")
     def validate_amount_classification(self) -> BudgetLineItem:
+        if self.ai_provenance is not None and self.evidence_kind == "verified_price":
+            raise ValueError("AI planning assumptions cannot claim verified price evidence.")
+        if self.flight_reference is not None or any(source.provider == "travelpayouts" for source in self.source_references):
+            if self.classification != "estimated" or self.source != "reference_data":
+                raise ValueError("Cached flight references cannot be live or verified prices.")
         if self.amount is None and self.classification != "unknown":
             raise ValueError("An unpriced line item must have unknown classification.")
         if self.amount is not None and self.classification == "unknown":
@@ -102,6 +112,11 @@ class BudgetLineItem(AgentSchema):
             or (self.maximum_amount is not None and self.maximum_amount < self.amount)
         ):
             raise ValueError("The typical amount must lie within its cost range.")
+        if self.ai_provenance is not None:
+            from .ai_cost_estimation import AICostProvenance
+            provenance = AICostProvenance.model_validate(self.ai_provenance)
+            provenance.validate_line_item(self)
+            self.ai_provenance = provenance.model_dump(mode="json")
         return self
 
 
@@ -154,6 +169,7 @@ class BudgetBreakdown(BudgetValidationResult):
     missing_price_actions: list[str] = Field(default_factory=list)
     pricing_status: Literal["COMPLETE_ESTIMATE", "LIVE_PRICE_VERIFIED", "INCOMPLETE"] = "INCOMPLETE"
     missing_price_inputs: list[str] = Field(default_factory=list)
+    flight_references: list[CachedFlightReference] = Field(default_factory=list)
     line_items: list[BudgetLineItem] = Field(default_factory=list)
     category_totals: list[BudgetCategoryTotal] = Field(default_factory=list)
     unpriced_components: list[str] = Field(default_factory=list)
@@ -166,6 +182,8 @@ class BudgetBreakdown(BudgetValidationResult):
 
     @model_validator(mode="after")
     def classify_price_evidence(self) -> BudgetBreakdown:
+        if any(item.ai_provenance is not None for item in self.line_items) and self.pricing_status == "LIVE_PRICE_VERIFIED":
+            raise ValueError("An AI-assisted budget cannot claim live price verification.")
         if self.estimated_total is None and (self.minimum_estimated_total is not None or self.maximum_estimated_total is not None):
             raise ValueError("An incomplete budget cannot have complete-trip range totals.")
         if self.estimated_total is not None and (

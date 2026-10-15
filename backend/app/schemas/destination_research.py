@@ -11,7 +11,7 @@ from .external import DailyWeather
 
 
 class SourceReference(AgentSchema):
-    provider: Literal["tavily", "amadeus"] = "tavily"
+    provider: Literal["tavily", "amadeus", "travelpayouts"] = "tavily"
     title: str
     url: HttpUrl
     topic: Literal[

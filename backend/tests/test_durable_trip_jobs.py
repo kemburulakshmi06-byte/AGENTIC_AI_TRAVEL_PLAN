@@ -196,7 +196,9 @@ def test_no_amadeus_does_not_disable_supported_independent_reference_estimates(d
         assert items[category]['source'] == 'reference_data'
         assert items[category]['confidence'] == 'low'
         assert items[category]['minimum_amount'] is None
-    supported_base = Decimal('9698') if 'Dubai' in destination else Decimal('40058')
+    # The returned budget is the final economy revision, not the initial
+    # domestic reference subtotal (40058). Flights and other provenance stay intact.
+    supported_base = Decimal('9698') if 'Dubai' in destination else Decimal('24254')
     if destination == 'Bengaluru':
         assert Decimal(items['intercity_transport']['amount']) == Decimal('30974.00')
         assert items['intercity_transport']['source'] == 'reference_data'

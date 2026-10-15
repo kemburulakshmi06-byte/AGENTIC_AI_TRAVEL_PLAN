@@ -7,7 +7,7 @@ import type {
 } from './types'
 
 const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001'
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 ).replace(/\/+$/, '')
 const REQUEST_TIMEOUT_MS = 12_000
 
@@ -85,6 +85,10 @@ function toApiError(status: number, payload: unknown): ApiError {
       validationDetails,
     )
   }
+  if ((status === 403 || status === 409) && isRecord(payload) && isRecord(payload.detail)
+    && typeof payload.detail.message === 'string') {
+    return new ApiError(payload.detail.message, status)
+  }
   if (status === 404) {
     return new ApiError('This trip could not be found.', status)
   }
@@ -133,4 +137,12 @@ export function getSavedTrips(
   signal?: AbortSignal,
 ): Promise<TripListResponse> {
   return requestJson('/api/v1/trips?limit=8&offset=0', { signal })
+}
+
+export function reviseTrip(tripId: string, allowEconomyAccommodation = false): Promise<TripCreatedResponse> {
+  return requestJson(`/api/v1/trips/${encodeURIComponent(tripId)}/revise`, {
+    method: 'POST',
+    headers: { 'X-Trip-Revision': '1' },
+    body: JSON.stringify({ allow_economy_accommodation: allowEconomyAccommodation }),
+  })
 }

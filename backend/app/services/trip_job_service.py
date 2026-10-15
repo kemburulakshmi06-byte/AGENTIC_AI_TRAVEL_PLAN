@@ -65,6 +65,8 @@ class TripJobService:
                 trip.status = job.status = "failed"
                 job.error_message = "The planning worker stopped repeatedly; retry limit reached. Submit a new request after worker recovery."
                 job.completed_at = now
+                from .interactive_budget_revision import finish_revision
+                finish_revision(job, {"execution_status": "FAILED"})
                 return None
             # Validate the persisted payload, including optional costs and notes.
             # Invalid durable input is a terminal error, never fake success.
@@ -75,12 +77,14 @@ class TripJobService:
                 trip.status = job.status = "failed"
                 job.error_message = "The persisted planning request failed schema validation."
                 job.completed_at = now
+                from .interactive_budget_revision import finish_revision
+                finish_revision(job, {"execution_status": "FAILED"})
                 return None
             token = str(uuid4())
             job.status = trip.status = "running"
             job.output_data = {**metadata, "attempts": attempts, "token": token,
                 "lease_expires_at": (now + timedelta(seconds=self.settings.TRIP_JOB_LEASE_SECONDS)).isoformat(),
-                "current_stage": "requirements"}
+                "current_stage": "budget_revision" if metadata.get("revision_pending") else "requirements"}
             return JobClaim(trip.id, token, request)
 
     def renew(self, claim: JobClaim) -> bool:

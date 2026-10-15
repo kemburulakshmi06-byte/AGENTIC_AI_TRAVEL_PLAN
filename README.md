@@ -555,6 +555,23 @@ status and are not safe credentials for public production use. Configure
 `TRIP_AGENT_TIMEOUT_SECONDS` (default 60), and `TRIP_MAX_REVISIONS` (default
 2) to bound workflow behavior.
 
+Interactive budget revision uses `POST /api/v1/trips/{trip_id}/revise` with
+`{"allow_economy_accommodation": false}`. The browser uses the existing status
+endpoint until the revised result is saved. Only complete over-budget snapshots
+qualify; fixed allowances and unchanged AI unit rates are retained. Economy
+accommodation requires explicit consent. The existing `TRIP_MAX_REVISIONS`
+setting also bounds interactive attempts per trip; identical no-op requests are
+rejected. Results include optional `budget_revision_summary` metadata with
+before/after totals, actual reductions, remaining overrun, and explanations.
+
+**Access boundary:** this mutation is local-development-only. It requires
+`APP_ENV=development`, a loopback peer and backend hostname, a permitted local
+frontend Origin (localhost/127.0.0.1 on 5173/5174), and `X-Trip-Revision: 1`.
+Production and remote requests receive 403. Implement authenticated trip
+ownership before enabling this endpoint on a public service; do not remove the
+boundary or treat CORS/trip IDs as authentication. No database migration is
+required; revision snapshots and history use the existing durable job record.
+
 Run the API tests, existing endpoint checks, and full offline backend suite
 from `backend/`:
 

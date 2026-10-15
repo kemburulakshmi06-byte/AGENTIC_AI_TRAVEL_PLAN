@@ -20,6 +20,8 @@ from ..schemas.budget import BudgetLineItem, CurrencyConversion, PriceSource
 from ..schemas.destination_research import DestinationResearch
 from ..tools.base import TravelAPIError, TravelAPIResponseError, TravelAPITool, TravelAPITimeoutError, TravelAPIUnavailableError
 from ..tools.travel_pricing import AmadeusPricingTool, location_key, full_location_key
+from ..tools.travelpayouts import TravelpayoutsPricingTool
+from ..schemas.flight_pricing import CachedFlightReference, invalid_cached_flight_line
 
 CENT = Decimal("0.01")
 
@@ -149,13 +151,23 @@ class ECBReferenceFXTool(TravelAPITool):
 
 
 class CostEstimationService:
-    def __init__(self, settings: Settings, *, fx=None, pricing=None, reference_data=None):
+    def __init__(self, settings: Settings, *, fx=None, pricing=None, reference_data=None, travelpayouts_pricing=None):
         self.settings = settings
         self.fx = fx
         self.pricing = pricing
         self.reference_data = reference_data
+        self.travelpayouts_pricing = travelpayouts_pricing
+        self.flight_references = []
+
+    async def estimate_ai_assumptions(self, request, *, existing_costs=(), gemini_service=None,
+                                      remaining_agent_seconds=None):
+        """Explicit foundation entry point; estimate_missing never invokes AI."""
+        from .ai_cost_estimation_service import AICostEstimationService
+        return await AICostEstimationService(self.settings, gemini_service=gemini_service).estimate_missing(
+            request, existing_costs=existing_costs, remaining_agent_seconds=remaining_agent_seconds)
 
     async def estimate_missing(self, requirements, research_data, plan, missing_categories):
+        self.flight_references = []
         started = perf_counter()
         warnings, actions, estimates = [], [], {}
         reference_unavailable = False
@@ -215,6 +227,29 @@ class CostEstimationService:
                 record_event("amadeus", "pricing", "failed", perf_counter(), category="timeout" if isinstance(error, TimeoutError) else getattr(error, "category", "invalid_schema"))
             finally:
                 if self.pricing is None:
+                    await tool.aclose()
+        if ("intercity_transport" in missing_categories and "intercity_transport" not in estimates
+            and mode in {None, "flight"} and not broad_origin and self.settings.TRAVELPAYOUTS_ENABLED):
+            tool = self.travelpayouts_pricing or TravelpayoutsPricingTool(settings=self.settings)
+            try:
+                async with asyncio.timeout(min(20, self.settings.TRIP_AGENT_TIMEOUT_SECONDS / 3)):
+                    quote = await tool.flight_cost(requirements, destination, country_code=research.country_code)
+                self.flight_references = [CachedFlightReference.model_validate(value)
+                                          for value in getattr(tool, "last_references", [])]
+                if quote is not None:
+                    quote = BudgetLineItem.model_validate(quote)
+                    if quote.flight_reference is None or invalid_cached_flight_line(quote, requirements):
+                        raise ValueError("Inapplicable cached flight reference.")
+                    estimates["intercity_transport"] = quote
+                    warnings.append("Travelpayouts supplied an applicable cached planning reference; live availability and booking prices were not checked.")
+                else:
+                    warnings.append("Travelpayouts returned no applicable exact-trip fare with established currency and passenger pricing basis; unrelated dates and unknown passenger totals were not substituted. Supply a flight allowance or confirm an applicable priced source.")
+            except (TravelAPIError, ValueError, ValidationError, TypeError, TimeoutError) as error:
+                warnings.append("Travelpayouts: " + ("provider request timed out" if isinstance(error, TimeoutError) else safe_failure_reason(error)) + ". Existing references or user allowances may still apply.")
+                record_event("travelpayouts", "pricing", "failed", perf_counter(),
+                             category="timeout" if isinstance(error, TimeoutError) else getattr(error, "category", "invalid_schema"))
+            finally:
+                if self.travelpayouts_pricing is None:
                     await tool.aclose()
         style = data.style_aliases.get((requirements.travel_style or "balanced").casefold())
         days = (requirements.end_date - requirements.start_date).days + 1

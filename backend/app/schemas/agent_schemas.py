@@ -124,6 +124,8 @@ class AgentContext(AgentSchema):
     accommodation_transport_plan: dict[str, Any] | None = None
     budget_breakdown: dict[str, Any] | None = None
     trip_itinerary: dict[str, Any] | None = None
+    # Internal workflow directive; never accepted from the public trip request.
+    budget_revision: dict[str, Any] | None = None
     trace_id: str | None = Field(default=None, max_length=100)
 
 

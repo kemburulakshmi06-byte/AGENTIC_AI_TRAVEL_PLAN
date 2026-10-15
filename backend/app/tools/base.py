@@ -96,7 +96,7 @@ class TravelAPITool:
 
     async def request_json(
         self, method: str, url: str, **kwargs: Any,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | list[Any]:
         started = perf_counter()
         operation = method + " " + urlsplit(url).path
         for attempt in range(self.settings.EXTERNAL_API_MAX_RETRIES + 1):
@@ -129,7 +129,8 @@ class TravelAPITool:
         form_body: dict[str, str] | None = None,
         decimal_json: bool = False,
         headers: dict[str, str] | None = None,
-    ) -> dict[str, Any]:
+        allow_list: bool = False,
+    ) -> dict[str, Any] | list[Any]:
         client = self._get_client()
         try:
             response = await client.request(
@@ -187,7 +188,7 @@ class TravelAPITool:
             raise TravelAPIResponseError(
                 self.provider, "provider returned invalid JSON.", category="invalid_json"
             ) from exc
-        if not isinstance(payload, dict):
+        if not isinstance(payload, dict) and not (allow_list and isinstance(payload, list)):
             raise TravelAPIResponseError(
                 self.provider, "provider returned an invalid response.", category="invalid_shape"
             )

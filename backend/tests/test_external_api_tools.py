@@ -66,6 +66,37 @@ def mocked_client(
     return httpx.AsyncClient(transport=httpx.MockTransport(handler))
 
 
+def test_geoapify_does_not_promote_address_to_a_named_food_venue() -> None:
+    async def run() -> None:
+        features = [
+            {"properties": {"lat": 15, "lon": 74, "place_id": "unnamed", "address_line1": "MDR48", "categories": ["catering.restaurant"]}},
+            {"properties": {"lat": 15, "lon": 74, "place_id": "named", "name": "Hotel Udupi Krishna", "categories": ["catering.restaurant"]}},
+        ]
+        tool = GeoapifyTool(provider_settings(), cache=FakeCache(), client=mocked_client(
+            lambda _request: httpx.Response(200, json={"features": features})))
+        try:
+            results = await tool.find_nearby_places(15, 74, category="food")
+            assert [item.place_id for item in results] == ["named"]
+        finally:
+            await tool.aclose()
+    asyncio.run(run())
+
+
+def test_geoapify_rejects_out_of_area_places_even_when_provider_distance_is_small() -> None:
+    async def run() -> None:
+        features = [{"properties": {"lat": lat, "lon": lon, "place_id": place_id,
+                    "name": "Provider sight", "distance": 1, "categories": ["tourism.sights"]}}
+                    for lat, lon, place_id in [(15, 74, "near"), (16, 75, "far")]]
+        tool = GeoapifyTool(provider_settings(), cache=FakeCache(), client=mocked_client(
+            lambda _request: httpx.Response(200, json={"features": features})))
+        try:
+            places = await tool.find_nearby_places(15, 74)
+            assert [item.place_id for item in places] == ["near"]
+        finally:
+            await tool.aclose()
+    asyncio.run(run())
+
+
 def test_geoapify_geocodes_and_caches_normalized_destination() -> None:
     async def run() -> None:
         cache = FakeCache()

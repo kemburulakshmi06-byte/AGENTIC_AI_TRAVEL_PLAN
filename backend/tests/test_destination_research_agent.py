@@ -266,6 +266,21 @@ def make_agent(
     )
 
 
+def test_research_excludes_address_only_and_non_travel_pois_but_keeps_food_venues() -> None:
+    async def run() -> None:
+        geo = FakeGeoapify(places=[
+            place("road", "MDR48", categories=["building.catering", "catering.restaurant"]),
+            place("stay", "Sample Hotel", categories=["accommodation.hotel"]),
+            place("other", "Office", categories=["office"]),
+            place("food", "Hotel Udupi Krishna", categories=["catering.restaurant"]),
+            place("sight", "Provider Memorial", categories=["tourism.sights.memorial"]),
+        ])
+        result = await make_agent(geo=geo).run(context(requirements(interests=["Food", "Culture"])))
+        assert {item.place_id for item in result.output.attractions} == {"food", "sight"}
+        assert any("accommodation is researched separately" in warning for warning in result.output.warnings)
+    asyncio.run(run())
+
+
 def test_successful_destination_research_keeps_verified_facts_and_ai_separate() -> None:
     async def run() -> None:
         geo, weather, tavily = FakeGeoapify(), FakeWeather(), FakeTavily()

@@ -37,6 +37,36 @@ class TripPlanRequest(TravelRequest):
         return self
 
 
+class TripRevisionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    allow_economy_accommodation: bool = False
+
+
+class TripRevisionRecord(BaseModel):
+    attempt: int
+    original_total: Decimal
+    revised_total: Decimal | None = None
+    savings: Decimal | None = None
+    remaining_over_budget: Decimal | None = None
+    currency: str
+    outcome: str
+    changes: list[str] = Field(default_factory=list)
+    explanation: str
+    outcome_message: str | None = None
+    original_budget: Decimal | None = None
+    cumulative_savings: Decimal | None = None
+    alternatives_exhausted: bool = False
+
+
+class TripRevisionSummary(BaseModel):
+    attempts: int
+    max_attempts: int
+    can_retry: bool
+    requires_economy_permission: bool = False
+    economy_accommodation_available: bool | None = None
+    history: list[TripRevisionRecord] = Field(default_factory=list)
+
+
 class TripCreatedResponse(BaseModel):
     trip_id: UUID
     task_id: UUID
@@ -112,6 +142,7 @@ class TripDetailsResponse(BaseModel):
     itinerary: dict[str, Any] | None = None
     budget: dict[str, Any] | None = None
     optimization_review: OptimizationReview | None = None
+    budget_revision_summary: TripRevisionSummary | None = None
     accommodation_transport: dict[str, Any] | None = None
     normalized_requirements: dict[str, Any] | None = None
     destination_research: dict[str, Any] | None = None

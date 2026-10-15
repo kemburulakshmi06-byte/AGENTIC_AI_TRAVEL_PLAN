@@ -214,6 +214,31 @@ def build_agent(
     )
 
 
+def test_food_stop_is_a_located_meal_with_verified_route_and_unknown_price() -> None:
+    async def run() -> None:
+        routing = FakeRouting(route_result(25))
+        dest = research(attractions=[
+            attraction("sight", "Provider Memorial", ["tourism.sights.memorial"]),
+            attraction("food", "Hotel Udupi Krishna", ["catering.restaurant"], 12.501, 77.501),
+            attraction("road", "MDR48", ["catering.restaurant"]),
+            attraction("stay", "Sample Stay", ["accommodation.hotel"]),
+        ])
+        result = await build_agent(routing=routing).run(context(requirements(interests=["culture"]), dest))
+        located = [item for item in result.output.days[0].activities if item.place_id]
+        assert [(item.place_id, item.activity_type) for item in located] == [("sight", "attraction"), ("food", "meal_break")]
+        food = located[1]
+        assert food.coordinates_verified and food.travel_time_verified
+        assert food.travel_time_provider == "openrouteservice"
+        assert food.estimated_cost is None and food.cost_classification == "unknown"
+        assert "Meal availability and prices are not verified" in food.description
+        assert "Confirm current opening hours" in food.description
+        assert len(routing.calls) == 1
+        food.coordinates_verified = False
+        assert any(issue.code == "unverified_attraction_coordinates" and issue.place_id == "food"
+                   for issue in validate_trip_itinerary(result.output))
+    asyncio.run(run())
+
+
 def test_valid_one_day_itinerary_includes_meal_rest_and_sources() -> None:
     async def run() -> None:
         result = await build_agent().run(context())

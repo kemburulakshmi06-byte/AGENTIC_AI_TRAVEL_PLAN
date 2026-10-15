@@ -285,6 +285,58 @@ def build_agent(gemini: FakeGemini | None = None) -> OptimizationAgent:
     )
 
 
+@pytest.mark.parametrize("category,name", [
+    ("catering.restaurant", "Hotel Udupi Krishna"),
+    ("accommodation.hotel", "Provider Hotel"),
+    ("highway", "Provider Road"),
+    ("catering.restaurant", "MDR48"),
+])
+def test_reviewer_blocks_pois_mislabeled_as_sightseeing(category, name) -> None:
+    async def run() -> None:
+        dest = research()
+        dest.attractions[0] = dest.attractions[0].model_copy(update={"name": name, "categories": [category]})
+        result = await build_agent().run(agent_context(dest=dest))
+        assert not result.output.approved
+        assert any(issue.code == "inappropriate_place_category" and issue.blocks_approval for issue in result.output.issues)
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("defect,expected", [
+    (None, None),
+    ("id", "unsupported_attraction_id"),
+    ("coordinates", "attraction_coordinate_mismatch"),
+    ("route", "route_duration_unverified"),
+    ("hours", "unsupported_opening_hours"),
+])
+def test_located_meal_preserves_reviewer_evidence_and_routing_checks(defect, expected) -> None:
+    async def run() -> None:
+        dest = research()
+        dest.attractions[1] = dest.attractions[1].model_copy(update={"categories": ["catering.restaurant"]})
+        trip = itinerary()
+        sight = trip.days[0].activities[0]
+        meal = trip.days[1].activities[0].model_copy(update={
+            "activity_type": "meal_break", "start_time": time(12), "end_time": time(13),
+            "travel_time_verified": True, "travel_time_from_previous_minutes": Decimal("25"),
+            "travel_time_provider": "openrouteservice",
+        })
+        trip.days[0].activities = [sight, meal]
+        trip.days[1].activities = []
+        if defect == "id": meal.place_id = "invented-id"
+        if defect == "coordinates": meal.latitude = 0
+        if defect == "route":
+            meal.travel_time_verified = False
+            meal.travel_time_from_previous_minutes = None
+            meal.travel_time_provider = None
+        if defect == "hours": meal.description = "Opens at 9 am."
+        result = await build_agent().run(agent_context(dest=dest, trip=trip))
+        if expected:
+            assert not result.output.approved
+            assert any(issue.code == expected and issue.blocks_approval for issue in result.output.issues)
+        else:
+            assert result.output.approved
+    asyncio.run(run())
+
+
 def test_valid_itinerary_is_approved_with_nonblocking_suggestions() -> None:
     async def run() -> None:
         result = await build_agent().run(agent_context())
@@ -326,7 +378,9 @@ def test_over_budget_and_unknown_costs_block_approval(
             agent_context(budget_result=current)
         )
         assert not result.output.approved
-        assert result.output.review_status == "REVISION_REQUIRED"
+        assert result.output.review_status == (
+            "INSUFFICIENT_DATA" if status == "INCOMPLETE_ESTIMATE" else "REVISION_REQUIRED"
+        )
         assert any(issue.code == expected_code for issue in result.output.issues)
 
     asyncio.run(run())

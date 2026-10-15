@@ -34,3 +34,24 @@ def matches_interest(attraction, interests):
                for group in interest_groups(interests)
                for prefix in INTEREST_CATEGORIES[group]
                for category in attraction.categories)
+
+
+def place_activity_type(place):
+    """Classify named provider POIs; an address/category alone is not a venue."""
+    name = place.name.strip()
+    if not name or re.fullmatch(r"(?:MDR|NH|SH)\s*[- ]?\d+[A-Z]?", name, re.IGNORECASE):
+        return None
+    categories = place.categories
+
+    def has_prefix(prefixes):
+        return any(category == prefix or category.startswith(prefix + ".")
+                   for category in categories for prefix in prefixes)
+
+    if has_prefix(("no_access", "accommodation", "highway", "road")):
+        return None
+    if has_prefix(("tourism.attraction", "tourism.sights", "tourism.museum",
+                   "entertainment", "heritage", "natural", "leisure.park")):
+        return "attraction"
+    if has_prefix(INTEREST_CATEGORIES["food"]):
+        return "meal_break"
+    return None

@@ -156,7 +156,12 @@ def test_requested_scenarios_through_real_api_background_service_and_six_agents(
         assert details["budget"]["pricing_status"] == "INCOMPLETE"
         contingency = next(item for item in details["budget"]["line_items"] if item["category"] == "contingency")
         if case == "C":
-            assert contingency["amount"] == "9474.00"
+            # Economy references can now reduce known costs even while the
+            # broad departure origin keeps the mandatory flight price unknown.
+            base = sum((Decimal(item["amount"]) for item in details["budget"]["line_items"]
+                        if item["category"] != "contingency" and item["amount"] is not None), Decimal("0"))
+            assert Decimal(contingency["amount"]) == (base * Decimal("0.10")).quantize(Decimal("0.01"))
+            assert base < Decimal("94740.00")
             assert contingency["source"] == "configured_assumption"
         else:
             assert contingency["amount"] is None

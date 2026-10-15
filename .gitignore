@@ -39,3 +39,11 @@ secrets.*
 .vscode/
 .DS_Store
 Thumbs.db
+# macOS ZIP metadata
+__MACOSX/
+._*
+# Duplicate extracted project folder
+/AI_TRAVEL_PLAN/
+
+# Temporary Git verification report
+/git-check.txt

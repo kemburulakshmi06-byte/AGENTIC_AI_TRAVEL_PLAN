@@ -25,6 +25,7 @@ from ..schemas.destination_research import (
     IntercityTransfer,
 )
 from ..schemas.external import DailyWeather, RouteResult
+from ..tools.place_interests import place_activity_type
 from ..schemas.itinerary import (
     DailyCostEstimate,
     DailyItinerary,
@@ -365,7 +366,7 @@ class ItineraryAgent(BaseAgent[TripItinerary]):
             activity.title.casefold()
             for day in daily_days
             for activity in day.activities
-            if activity.activity_type == "attraction"
+            if is_place_activity(activity)
         }
         unscheduled = [
             attraction
@@ -803,11 +804,14 @@ class ItineraryAgent(BaseAgent[TripItinerary]):
             ]
             activities.append(
                 ItineraryActivity(
-                    activity_type="attraction",
+                    activity_type=place_activity_type(attraction),
                     title=attraction.name,
                     description=(
-                        f"Visit the provider-listed place {attraction.name}. "
-                        "Confirm current opening hours before departure."
+                        (f"Food stop at the provider-listed venue {attraction.name}. "
+                         "Meal availability and prices are not verified. "
+                         if place_activity_type(attraction) == "meal_break"
+                         else f"Visit the provider-listed place {attraction.name}. ")
+                        + "Confirm current opening hours before departure."
                     ),
                     start_time=_minute_time(current_minute),
                     end_time=_minute_time(end_minute),
@@ -981,6 +985,13 @@ def _empty_itinerary(
     )
 
 
+def is_place_activity(activity: ItineraryActivity) -> bool:
+    """Located food stops require the same evidence and routes as sightseeing."""
+    return activity.activity_type == "attraction" or (
+        activity.activity_type == "meal_break" and activity.place_id is not None
+    )
+
+
 def _deduplicate_attractions(
     attractions: list[Attraction],
     issues: list[ItineraryValidationIssue],
@@ -990,6 +1001,9 @@ def _deduplicate_attractions(
     seen_ids: set[str] = set()
     seen_locations: set[tuple[str, str]] = set()
     for attraction in attractions:
+        if place_activity_type(attraction) is None:
+            warnings.append(f"Provider POI {attraction.name} was excluded because its name or category does not support a sightseeing or food stop.")
+            continue
         place_id = attraction.place_id
         location_key = (
             attraction.name.strip().casefold(),
@@ -1327,7 +1341,7 @@ def _validate_itinerary_dates(
                         place_id=activity.place_id,
                     )
                 )
-            if activity.activity_type == "attraction" and not activity.coordinates_verified:
+            if is_place_activity(activity) and not activity.coordinates_verified:
                 issues.append(
                     ItineraryValidationIssue(
                         code="unverified_attraction_coordinates",
@@ -1339,9 +1353,9 @@ def _validate_itinerary_dates(
                 )
             if (
                 activity.travel_time_from_previous_minutes is None
-                and activity.activity_type == "attraction"
+                and is_place_activity(activity)
                 and any(
-                    previous.activity_type == "attraction"
+                    is_place_activity(previous)
                     for previous in day.activities
                     if previous.end_time < activity.start_time
                 )

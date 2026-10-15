@@ -68,3 +68,5 @@ class TravelWorkflowState(TypedDict, total=False):
     excluded_attraction_ids: list[str]
     revision_directive: RevisionDirective | None
     budget_inputs_changed: bool
+    budget_revision: dict | None
+    budget_revision_fingerprints: list[str]

@@ -364,3 +364,156 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Persisted results dashboard; scoped to preserve the existing planner form. */
+.dashboard-workspace { width: min(1120px, 100%); border-radius: 24px; background: #f7fafb; box-shadow: 0 24px 70px #17384912; }
+.dashboard-workspace .trip-result-view, .dashboard-workspace .terminal-state { padding: clamp(16px, 3vw, 32px); }
+.results-dashboard { text-align: left; color: #173849; }
+.results-dashboard .eyebrow { color: #216c65; font-size: 10px; }
+.results-hero { overflow: hidden; padding: clamp(22px, 4vw, 38px); border: 1px solid #d9e9e7; border-radius: 20px; background: radial-gradient(ellipse at 100% 0%, #cce9e5 0, transparent 53%), linear-gradient(125deg, #edf7f4, #f3f6fc); }
+.results-hero-top, .destination-heading, .dashboard-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.results-hero h2, .terminal-state .results-hero h2 { margin: 22px 0 12px; color: #173849; font-size: clamp(23px, 3vw, 34px); font-weight: 650; line-height: 1.2; letter-spacing: -1.2px; }
+.destination-heading { justify-content: flex-start; flex-wrap: wrap; }
+.destination-heading h3 { margin: 0; color: #173849; font-size: clamp(30px, 4vw, 44px); font-weight: 550; letter-spacing: -1.7px; overflow-wrap: anywhere; }
+.plan-status { flex-shrink: 0; padding: 7px 12px; border: 1px solid #bedad7; border-radius: 30px; color: #245e59; background: #ffffffb8; font-size: 12px; font-weight: 650; }
+.saved-plan-title { margin: 7px 0 24px; color: #4c6670; font-size: 14px; }
+.trip-facts { display: flex; flex-wrap: wrap; gap: 20px 30px; border-top: 1px solid #cddfdf; padding-top: 22px; }
+.trip-facts > div { display: grid; align-content: start; gap: 7px; }
+.trip-facts dt { color: #4d666e; font-size: 11px; }
+.trip-facts dd { margin: 0; color: #193e4a; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.hero-footnote { margin: 24px 0 0; color: #4c6972; font-size: 11px; line-height: 1.6; }
+.results-dashboard .review-pill { font-size: 11px; padding: 7px 12px; color: #805522; background: #fff1d8; }
+.results-dashboard .review-pill.approved { color: #1b6656; background: #daf1e7; }
+.dashboard-section-heading { margin-bottom: 20px; }
+.dashboard-section-heading h3 { margin: 5px 0 0; color: #173849; font-size: 20px; font-weight: 650; letter-spacing: -.5px; }
+.dashboard-section-heading h4 { margin: 0; font-size: 14px; }
+.currency-label, .section-caption { color: #526b76; font-size: 11px; line-height: 1.6; }
+.currency-label { padding: 6px 10px; border: 1px solid #dce7ea; border-radius: 8px; background: #f7fafb; white-space: nowrap; }
+.results-dashboard .budget-card { margin: 22px 0; padding: clamp(18px, 3vw, 28px); border-color: #e0e9ee; border-radius: 20px; background: #fff; box-shadow: 0 8px 28px #17384906; }
+.results-dashboard .budget-total { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.results-dashboard .budget-total > div { display: flex; min-width: 0; flex-direction: column; gap: 12px; padding: 16px 12px; border: 1px solid #e3ecef; border-radius: 13px; background: #f7fafb; }
+.results-dashboard .budget-total > div:first-child { border-color: #cde6de; background: #eaf6f1; }
+.results-dashboard .budget-total .eyebrow { font-size: 9px; letter-spacing: 1px; }
+.results-dashboard .budget-total strong { font-size: clamp(16px, 1.9vw, 22px); font-weight: 650; letter-spacing: -.5px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.metric-caption { color: #526b76; font-size: 10px; }
+.results-dashboard .budget-total .metric-overrun { background: #fff1ed; border-color: #f0cfc5; }
+.results-dashboard .metric-overrun strong { color: #a13e2f; }
+.budget-utilization { margin: 22px 0; }
+.budget-utilization p { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; color: #506a74; font-size: 12px; }
+.budget-utilization strong { color: #256957; font-weight: 600; }
+.utilization-track, .category-meter { overflow: hidden; height: 8px; border-radius: 20px; background: #e9f0f2; }
+.utilization-track > span, .category-meter > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #237e74, #60b2a2); }
+.utilization-over .utilization-track > span { background: linear-gradient(90deg, #ad4e37, #df9672); }
+.utilization-over strong { color: #9b412f; }
+.ai-estimate-notice { display: flex; gap: 10px; margin: 20px 0 0; padding: 14px 16px; border: 1px solid #dcdcf3; border-radius: 12px; color: #4e487d; background: #f5f3fd; font-size: 12px; line-height: 1.7; }
+.ai-estimate-notice > span { font-size: 18px; }
+.results-dashboard .inline-note { padding: 12px 14px; color: #4c626e; font-size: 12px; }
+.category-dashboard { margin: 24px 0; padding-top: 22px; border-top: 1px solid #e3ecef; }
+.category-dashboard .dashboard-section-heading { align-items: baseline; margin-bottom: 15px; }
+.results-dashboard .cost-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin: 0; padding: 0; border: 0; }
+.results-dashboard .cost-breakdown .category-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; font-size: 12px; }
+.results-dashboard .cost-breakdown dt { color: #4d6670; }
+.results-dashboard .cost-breakdown dd { color: #234957; font-variant-numeric: tabular-nums; }
+.results-dashboard .cost-breakdown em { grid-column: 1 / -1; color: #875b23; font-size: 11px; }
+.results-dashboard .cost-breakdown .category-meter { display: block; grid-column: 1 / -1; height: 6px; }
+.category-intercity_transport .category-meter > span { background: #647fb8; }
+.category-food .category-meter > span { background: #ad783c; }
+.category-local_transport .category-meter > span { background: #5a929e; }
+.category-activities .category-meter > span { background: #8873af; }
+.category-contingency .category-meter > span { background: #718188; }
+.unavailable-meter { background: repeating-linear-gradient(120deg, #edf1f3, #edf1f3 5px, #f8fafb 5px, #f8fafb 10px); }
+.results-dashboard .budget-line-items { gap: 14px; padding-top: 18px; }
+.results-dashboard .budget-line-items li { gap: 16px; padding: 0 0 14px; border-bottom: 1px solid #edf1f3; font-size: 13px; }
+.cost-item-details { display: grid; gap: 6px; min-width: 0; }
+.cost-item-title { color: #294957; font-weight: 650; }
+.cost-evidence-details { margin: 22px 0 0; padding: 16px; border: 1px solid #e0e9ee; border-radius: 12px; background: #fcfdfd; }
+.cost-evidence-details summary { color: #294957; font-size: 13px; font-weight: 650; cursor: pointer; }
+.cost-evidence-details summary span { display: block; margin: 6px 0 0 16px; color: #526975; font-size: 11px; font-weight: 400; }
+.cost-evidence-details summary:focus-visible { outline: 3px solid #45cbbb; outline-offset: 5px; border-radius: 3px; }
+.results-dashboard .budget-line-items small { color: #506976; font-size: 11px; line-height: 1.7; text-transform: none; overflow-wrap: anywhere; }
+.results-dashboard .budget-line-items .evidence-label { width: fit-content; padding: 3px 8px; border-radius: 6px; color: #415c67; background: #edf3f5; }
+.results-dashboard .budget-line-items .ai-unit-rate { color: #5d4e88; }
+.results-dashboard .budget-line-items li > strong { font-size: 13px; color: #234957; font-variant-numeric: tabular-nums; }
+.results-dashboard .budget-disclaimer { font-size: 11px; color: #526975; }
+.results-dashboard .remaining-budget { font-size: 12px; }
+.results-dashboard .remaining-budget strong { color: #275e56; }
+.results-dashboard .budget-alert, .results-dashboard .unpriced-list { font-size: 12px; }
+.itinerary-section { margin: 30px 0; }
+.results-dashboard .days-list { gap: 20px; }
+.results-dashboard .day-card { border-color: #e1eaed; border-radius: 17px; padding: clamp(18px, 2.6vw, 26px); background: #fff; box-shadow: 0 6px 22px #17384905; }
+.results-dashboard .itinerary-day { border-top: 3px solid #51998e; }
+.results-dashboard .day-header h4 { margin: 7px 0 0; color: #244653; font-size: 19px; font-weight: 600; letter-spacing: -.4px; }
+.results-dashboard .day-cost { color: #326a60; font-size: 12px; line-height: 1.7; text-align: right; font-variant-numeric: tabular-nums; }
+.results-dashboard .day-summary { color: #4e6874; font-size: 13px; line-height: 1.8; }
+.results-dashboard .activity-card { grid-template-columns: 110px minmax(0, 1fr); gap: 20px; padding: 22px 0; }
+.results-dashboard .activity-time { padding-top: 3px; color: #2a6a63; font-size: 12px; line-height: 1.7; }
+.results-dashboard .activity-title-row { flex-wrap: wrap; }
+.results-dashboard .activity-title-row h4 { font-size: 16px; line-height: 1.5; letter-spacing: -.2px; }
+.results-dashboard .activity-title-row > span { font-size: 12px; color: #4b6570; }
+.results-dashboard .activity-content p, .results-dashboard .weather-note { color: #4d6774; font-size: 12px; line-height: 1.8; }
+.results-dashboard .activity-category { padding: 5px 9px; color: #3d6271; background: #edf3f6; font-size: 10px; }
+.results-dashboard .meal-category { color: #805525; background: #fcf1df; }
+.results-dashboard .activity-content .activity-warning { color: #835b26; }
+.results-dashboard a { color: #22685f; font-size: 12px; }
+.optimization-summary { margin: 24px 0; padding: 24px; border: 1px solid #dce5f0; border-radius: 18px; background: linear-gradient(125deg, #f0f5fc, #f6fafb); }
+.optimization-summary > p, .optimization-summary li { color: #4b6574; font-size: 12px; line-height: 1.8; }
+.optimization-facts { display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 20px; margin: 20px 0 0; }
+.optimization-facts > div { display: grid; align-content: start; gap: 6px; font-size: 12px; }
+.optimization-facts strong { color: #2d4b5e; }
+.optimization-facts span { color: #4f6778; line-height: 1.7; }
+.travel-logistics-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 20px; margin: 24px 0; }
+.travel-logistics-grid section { min-width: 0; }
+.travel-logistics-grid h3 { margin-bottom: 10px; font-size: 17px; }
+.travel-logistics-grid p, .travel-logistics-grid small { color: #506976; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.results-dashboard .warnings-card, .results-dashboard .review-notes, .results-dashboard .missing-info { padding: 22px; border-radius: 16px; }
+.results-dashboard .warnings-card h3, .results-dashboard .review-notes h3, .results-dashboard .missing-info h3, .results-dashboard .source-section h3 { color: #294958; font-size: 17px; }
+.results-dashboard .warnings-card p, .results-dashboard .review-notes p, .results-dashboard .review-notes li, .results-dashboard .missing-info li { color: #506570; font-size: 12px; line-height: 1.8; }
+.results-dashboard .source-section { padding: 10px 4px; }
+.results-dashboard .source-section a { overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .results-dashboard .budget-total { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .optimization-facts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 680px) {
+  .dashboard-workspace { border-radius: 17px; }
+  .results-hero { padding: 20px 17px; }
+  .results-hero-top { align-items: flex-start; }
+  .results-hero-top .eyebrow { max-width: 160px; line-height: 1.8; }
+  .plan-status { padding: 6px 9px; font-size: 10px; }
+  .trip-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 14px; }
+  .trip-facts > div:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  .dashboard-section-heading { align-items: flex-start; flex-wrap: wrap; gap: 9px; }
+  .dashboard-section-heading h3 { font-size: 19px; }
+  .results-dashboard .budget-total { gap: 8px; }
+  .results-dashboard .budget-total > div { padding: 13px 9px; }
+  .results-dashboard .cost-breakdown { grid-template-columns: 1fr; }
+  .results-dashboard .activity-card { grid-template-columns: 1fr; gap: 7px; padding: 19px 0; }
+  .results-dashboard .day-cost { max-width: 135px; font-size: 10px; }
+  .results-dashboard .budget-line-items li { flex-wrap: wrap; gap: 7px; }
+  .results-dashboard .budget-line-items li > strong { flex-basis: 100%; }
+  .travel-logistics-grid, .optimization-facts { grid-template-columns: 1fr; }
+  .optimization-summary { padding: 20px 17px; }
+}
+
+/* Compact result summaries; full provider/reviewer evidence remains expandable. */
+.results-dashboard .compact-result-card { padding: clamp(16px, 2vw, 22px); }
+.compact-result-card > h3 { margin: 0 0 12px; }
+.compact-result-card > p { margin: 8px 0; }
+.result-details { margin-top: 14px; border-top: 1px solid #dfe8eb; padding-top: 12px; color: #506570; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.result-details > summary { width: fit-content; cursor: pointer; color: #285e63; font-weight: 650; }
+.result-details > summary:focus-visible { outline: 3px solid #45cbbb; outline-offset: 4px; border-radius: 3px; }
+.result-details[open] > summary { margin-bottom: 12px; }
+.result-details ul { padding-left: 18px; }
+.result-details li + li { margin-top: 8px; }
+.flight-cost-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+.flight-cost-summary > strong { color: #234957; font-size: clamp(22px, 3vw, 28px); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.results-dashboard .compact-overrun { color: #93502b; }
+
+.result-details small { display: block; margin: 6px 0; }
+
+.revision-outcome-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 18px 0; }
+.revision-outcome-metrics dt { color: #526975; font-size: 11px; margin-bottom: 6px; }
+.revision-outcome-metrics dd { margin: 0; color: #244653; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.revision-next-steps { margin: 16px 0; font-size: 12px; color: #506570; }
+.revision-next-steps ul { padding-left: 18px; line-height: 1.8; }
+@media (max-width: 700px) { .revision-outcome-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

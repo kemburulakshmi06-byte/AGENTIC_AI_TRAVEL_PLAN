@@ -3,11 +3,31 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from ..schemas.ai_cost_estimation import AICostCategory, AIUnitRateBounds
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 ENV_FILE = BACKEND_DIR / ".env"
+DEVELOPMENT_CORS_ORIGINS = (
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+)
+
+
+def _ai_unit_rate_bounds():
+    """Broad validation policy in each currency, not fares or FX conversions."""
+    policies = {
+        "USD": ((10, 20000), (5, 10000), (1, 1000), (1, 5000), (1, 10000)),
+        "AED": ((30, 75000), (20, 40000), (5, 4000), (2, 20000), (5, 40000)),
+        "INR": ((500, 1500000), (200, 800000), (50, 100000), (50, 500000), (50, 1000000)),
+    }
+    categories = ("intercity_transport", "accommodation", "food", "local_transport", "activities")
+    return {currency: {category: AIUnitRateBounds(minimum=low, maximum=high)
+                       for category, (low, high) in zip(categories, bounds)}
+            for currency, bounds in policies.items()}
 
 
 class Settings(BaseSettings):
@@ -37,6 +57,9 @@ class Settings(BaseSettings):
     OPENROUTESERVICE_API_KEY: SecretStr | None = None
     TAVILY_API_KEY: SecretStr | None = None
     AUTOMATIC_COST_ESTIMATION_ENABLED: bool = True
+    AI_COST_ESTIMATION_ENABLED: bool = False
+    AI_COST_ESTIMATION_TIMEOUT_SECONDS: float = Field(default=10.0, gt=0, le=20, allow_inf_nan=False)
+    AI_COST_ESTIMATION_RATE_BOUNDS: dict[str, dict[AICostCategory, AIUnitRateBounds]] = Field(default_factory=_ai_unit_rate_bounds)
     COST_REFERENCE_FILE: Path = BACKEND_DIR / "data" / "cost_references.json"
     DEFAULT_ESTIMATE_CONTINGENCY_PERCENT: Decimal = Field(default=Decimal("10"), ge=0, le=100)
     REFERENCE_FX_ENABLED: bool = True
@@ -44,6 +67,8 @@ class Settings(BaseSettings):
     AMADEUS_API_KEY: SecretStr | None = None
     AMADEUS_API_SECRET: SecretStr | None = None
     AMADEUS_ENVIRONMENT: Literal["test", "production"] = "test"
+    TRAVELPAYOUTS_API_TOKEN: SecretStr | None = None
+    TRAVELPAYOUTS_ENABLED: bool = False
     DATABASE_URL: SecretStr | None = None
     TEST_DATABASE_URL: SecretStr | None = None
     UPSTASH_REDIS_REST_URL: SecretStr | None = None
@@ -65,7 +90,26 @@ class Settings(BaseSettings):
 
     @property
     def allowed_origins(self) -> list[str]:
-        return list(dict.fromkeys([*self.CORS_ORIGINS, self.FRONTEND_URL]))
+        origins = [*self.CORS_ORIGINS, self.FRONTEND_URL]
+        if self.APP_ENV == "development":
+            origins.extend(DEVELOPMENT_CORS_ORIGINS)
+        return list(dict.fromkeys(origins))
+
+    @field_validator("CORS_ORIGINS", "FRONTEND_URL")
+    @classmethod
+    def require_explicit_cors_origins(cls, value):
+        origins = value if isinstance(value, list) else [value]
+        if any("*" in origin for origin in origins):
+            raise ValueError("CORS requires explicit origins because credentials are enabled.")
+        return value
+
+    @field_validator("AI_COST_ESTIMATION_RATE_BOUNDS")
+    @classmethod
+    def validate_ai_bound_currencies(cls, value):
+        if any(len(currency) != 3 or not currency.isascii() or not currency.isupper()
+               or not currency.isalpha() for currency in value):
+            raise ValueError("AI sanity policies require uppercase currency codes.")
+        return value
 
     def require_integration_settings(self, *integrations: str) -> None:
         required_settings = {
@@ -73,6 +117,7 @@ class Settings(BaseSettings):
             "geoapify": ("GEOAPIFY_API_KEY",),
             "openrouteservice": ("OPENROUTESERVICE_API_KEY",),
             "tavily": ("TAVILY_API_KEY",),
+            "travelpayouts": ("TRAVELPAYOUTS_API_TOKEN",),
             "database": ("DATABASE_URL",),
             "upstash_redis": (
                 "UPSTASH_REDIS_REST_URL",

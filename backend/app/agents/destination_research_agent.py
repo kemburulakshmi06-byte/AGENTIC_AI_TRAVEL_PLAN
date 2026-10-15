@@ -33,7 +33,7 @@ from ..schemas.external import GeocodingResult, PlaceResult, TravelSearchResult
 from ..services.gemini_service import GeminiService, GeminiServiceError
 from ..tools.base import TravelAPIError
 from ..tools.geoapify import GeoapifyTool, _location_tokens, _destination_match_score
-from ..tools.place_interests import matches_interest
+from ..tools.place_interests import matches_interest, place_activity_type
 from ..tools.open_meteo import OpenMeteoTool, UnsupportedForecastDateError
 from ..tools.tavily import TavilyTool
 from ..tools.openrouteservice import OpenRouteServiceTool
@@ -487,7 +487,10 @@ class DestinationResearchAgent(BaseAgent[DestinationResearch]):
             warnings.append("Geoapify attraction lookup failed.")
             warnings.append("Geoapify attractions: " + safe_failure_reason(error) + ".")
             return []
-        verified = _deduplicate_attractions([place for place in places if place.place_id and "no_access" not in place.categories])
+        eligible = [place for place in places if place.place_id and place_activity_type(place)]
+        if len(eligible) != len(places):
+            warnings.append("Provider POIs without a usable venue name or supported sightseeing/food category were excluded; accommodation is researched separately.")
+        verified = _deduplicate_attractions(eligible)
         if not verified:
             warnings.append("Geoapify returned no verified places with usable provider identifiers for this area.")
         return verified

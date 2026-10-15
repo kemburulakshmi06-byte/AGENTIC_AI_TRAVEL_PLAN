@@ -34,6 +34,7 @@ from ..schemas.trip_api import (
 )
 from ..workflows.state import TravelWorkflowState
 from ..workflows.travel_graph import plan_trip
+from .interactive_budget_revision import RevisionConflict, snapshot_for, revision_summary, finish_revision, exhausted_inputs, economy_permission_available
 from .task_status_service import TaskStatusName, TaskStatusService
 from .trip_job_service import JOB_AGENT, job_for, new_job, owns_job
 
@@ -61,6 +62,7 @@ class TripPlanningService:
         self._task_status = task_status
         self._workflow = workflow
         self._settings = settings or get_settings()
+        self._revision_requested = False
 
     async def create_trip(self, request: TravelRequest) -> UUID:
         trip_id = uuid4()
@@ -71,6 +73,67 @@ class TripPlanningService:
             raise TripPersistenceError from exc
         await self._safe_redis_create(trip_id)
         return trip_id
+
+    async def revise_trip(self, trip_id: UUID, *, allow_economy_accommodation: bool = False) -> TravelRequest:
+        details = await self.get_trip(trip_id)
+        try:
+            request = await run_in_threadpool(self._queue_revision, trip_id, details, allow_economy_accommodation)
+        except SQLAlchemyError as exc:
+            raise TripPersistenceError from exc
+        self._revision_requested = True
+        await self._safe_redis_create(trip_id)
+        return request
+
+    def _queue_revision(self, trip_id, details, allow_economy):
+        with self._session_factory() as session, session.begin():
+            trip = session.execute(select(Trip).where(Trip.id == trip_id).with_for_update()).scalar_one_or_none()
+            if trip is None:
+                raise TripNotFoundError
+            if trip.status not in {"completed", "revision_required", "failed"}:
+                raise RevisionConflict("The trip is already processing or is not eligible for a budget revision.")
+            if trip.total_estimated_cost != details.total_estimated_cost:
+                raise RevisionConflict("The saved result changed; reload it before requesting revision.")
+            job = job_for(session, trip_id)
+            metadata = dict(job.output_data or {}) if job else {}
+            if trip.status == "failed" and not (metadata.get("revision_history") and metadata["revision_history"][-1]["outcome"] == "failed"):
+                raise RevisionConflict("Only failed budget revisions with a retained complete plan can be retried.")
+            attempts = metadata.get("interactive_attempts", 0)
+            if attempts >= self._settings.TRIP_MAX_REVISIONS:
+                raise RevisionConflict("The budget revision attempt limit has been reached.")
+            raw = dict(job.input_data if job else details.request)
+            if raw.get("cost_preferences") is not None:
+                raw["constraints"] = {key: value for key, value in (raw.get("constraints") or {}).items() if key != "cost_preferences"}
+            request = TravelRequest.model_validate(raw)
+            runs = session.scalars(select(AgentRun).where(AgentRun.trip_id == trip_id).order_by(AgentRun.started_at)).all()
+            workflow = next((row.output_data or {} for row in reversed(runs) if row.agent_name == "workflow"), {})
+            snapshot = snapshot_for(details, request, workflow.get("budget_revision"), allow_economy)
+            if exhausted_inputs(metadata, snapshot, allow_economy):
+                raise RevisionConflict("No new permitted alternatives are available; repeated identical revisions are disabled. Supply new supported prices or approve a compatible change.")
+            if (metadata.get("revision_history") and exhausted_inputs(metadata, snapshot, False)
+                and allow_economy and not economy_permission_available(snapshot, self._settings)):
+                raise RevisionConflict("Economy permission cannot change these fixed or already optimized costs; new supported prices are required.")
+            snapshot["agent_history"] = [dict(agent_name=row.agent_name, status=row.status,
+                started_at=_utc_iso(row.started_at), finished_at=_utc_iso(row.completed_at or row.started_at),
+                duration_ms=0, error=row.error_message, output_data=row.output_data["result"])
+                for row in runs if row.agent_name not in {JOB_AGENT, "workflow"} and row.output_data and row.output_data.get("result")]
+            if job is None:
+                job = new_job(trip_id, request)
+                session.add(job)
+            job.input_data = request.model_dump(mode="json")
+            job.status = trip.status = "queued"
+            job.started_at = datetime.now(timezone.utc)
+            job.completed_at = None
+            job.error_message = None
+            job.output_data = {"attempts": 0, "current_stage": "budget_revision", "interactive_attempts": attempts + 1,
+                "revision_pending": True, "revision_snapshot": snapshot,
+                "revision_history": metadata.get("revision_history", []), "last_economy_permission": allow_economy,
+                "exhausted_revision_inputs": metadata.get("exhausted_revision_inputs", [])}
+            return request
+
+    def _revision_metadata(self, trip_id):
+        with self._session_factory() as session:
+            job = job_for(session, trip_id)
+            return dict(job.output_data or {}) if job else {}
 
     async def run_trip(self, trip_id: UUID, request: TravelRequest, *, lease_token: str | None = None) -> None:
         with diagnostic_context(trip_id=trip_id):
@@ -86,6 +149,10 @@ class TripPlanningService:
         options = {}
         if lease_token is not None:
             options["on_state"] = checkpoint
+        if lease_token is not None or self._revision_requested:
+            metadata = await run_in_threadpool(self._revision_metadata, trip_id)
+            if metadata.get("revision_pending"):
+                options["revision_snapshot"] = metadata["revision_snapshot"]
         await self._safe_redis_update(
             trip_id,
             status="running",
@@ -348,9 +415,11 @@ class TripPlanningService:
                     self._save_itinerary(session, trip_id, itinerary)
                 self._save_agent_runs(session, trip_id, result)
                 self._save_workflow_summary(session, trip_id, result)
-                if lease_token is not None:
-                    job = job_for(session, trip_id)
+                job = job_for(session, trip_id) if lease_token is not None or (result.get("budget_revision") or {}).get("interactive") else None
+                if job is not None:
                     job.output_data = {**job.output_data, "current_stage": result.get("current_stage")}
+                    if terminal:
+                        finish_revision(job, result)
                     if terminal:
                         job.status = trip_status
                         job.completed_at = datetime.now(timezone.utc)
@@ -476,6 +545,8 @@ class TripPlanningService:
                 output_data={
                     "current_stage": result.get("current_stage"),
                     "revision_count": result.get("revision_count", 0),
+                    "budget_revision": result.get("budget_revision"),
+                    "final_accommodation_transport": _json_value(result.get("accommodation_transport_plan")),
                     "warnings": result.get("warnings", []),
                     "errors": result.get("errors", []),
                     "source_references": [
@@ -505,11 +576,12 @@ class TripPlanningService:
                     if lease_token is not None and not owns_job(session, trip_id, lease_token):
                         return False
                     trip.status = status
-                    if lease_token is not None:
+                    if lease_token is not None or self._revision_requested:
                         job = job_for(session, trip_id)
                         job.status = status
                         job.error_message = message
                         job.completed_at = datetime.now(timezone.utc)
+                        finish_revision(job, {"execution_status": "FAILED"})
                     session.add(
                         AgentRun(
                             trip_id=trip_id,
@@ -518,8 +590,8 @@ class TripPlanningService:
                             input_data={},
                             output_data={"errors": [message]},
                             error_message=message,
-                            started_at=trip.created_at,
-                            completed_at=None,
+                            started_at=datetime.now(timezone.utc),
+                            completed_at=datetime.now(timezone.utc),
                         )
                     )
                 return True
@@ -554,6 +626,9 @@ class TripPlanningService:
             review_data = run_output.get("optimization_review", {}).get("result")
             accommodation_transport_data = run_output.get("accommodation_transport", {}).get("result")
             workflow = run_output.get("workflow", {})
+            accommodation_transport_data = workflow.get("final_accommodation_transport") or accommodation_transport_data
+            revision_job = next((row for row in trip.agent_runs if row.agent_name == JOB_AGENT), None)
+            revision_meta = (revision_job.output_data or {}) if revision_job else {}
             warnings = list((workflow or {}).get("warnings", []))
             errors = list((workflow or {}).get("errors", []))
             if trip.status == "failed" and not errors:
@@ -625,6 +700,11 @@ class TripPlanningService:
                 itinerary=itinerary_data,
                 budget=budget_data,
                 optimization_review=review_data,
+                budget_revision_summary=revision_summary(revision_meta, self._settings.TRIP_MAX_REVISIONS,
+                    settings=self._settings, snapshot={"budget_breakdown": budget_data,
+                        "normalized_requirements": run_output.get("requirements", {}).get("result"),
+                        "budget_revision": workflow.get("budget_revision"),
+                        "request": revision_job.input_data if revision_job else {}}),
                 accommodation_transport=accommodation_transport_data,
                 normalized_requirements=run_output.get("requirements", {}).get("result"),
                 destination_research=run_output.get("destination_research", {}).get("result"),
@@ -844,3 +924,7 @@ def _workflow_finished(result: TravelWorkflowState):
         (item.finished_at for item in history),
         default=datetime.now(timezone.utc),
     )
+
+
+def _utc_iso(value):
+    return (value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value).isoformat()

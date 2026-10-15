@@ -344,7 +344,7 @@ def _place_properties(properties: dict[str, Any]) -> dict[str, Any]:
         place_id = properties.get("place_id") or raw_id
         return {
             "place_id": str(place_id) if place_id is not None else None,
-            "name": properties.get("name") or properties.get("address_line1"),
+            "name": properties.get("name"),
             "categories": properties.get("categories") or [],
             "latitude": properties["lat"],
             "longitude": properties["lon"],

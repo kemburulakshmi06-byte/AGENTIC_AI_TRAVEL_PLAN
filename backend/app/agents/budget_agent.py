@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeVar
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from ..core.config import Settings, get_settings
 from ..core.diagnostics import safe_failure_reason, record_event
@@ -33,6 +34,9 @@ from ..schemas.budget import (
 from ..services.gemini_service import GeminiService, GeminiServiceError
 from ..services.cost_estimation_service import CostEstimationService
 from ..schemas.budget import PriceSource
+from ..schemas.flight_pricing import invalid_cached_flight_line
+from ..schemas.ai_cost_estimation import AICostEstimationRequest, AICostEstimationResult, AICostScope
+from ..schemas.destination_research import DestinationResearch
 from datetime import date
 from .base_agent import BaseAgent
 
@@ -64,18 +68,19 @@ _SYSTEM_INSTRUCTION = (
     "Explain missing inputs and tradeoffs without claiming price verification."
 )
 _CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
+_GeminiOutput = TypeVar("_GeminiOutput", bound=BaseModel)
 
 
 class BudgetNarrativeGenerator(Protocol):
     async def generate_structured(
         self,
         prompt: str,
-        response_model: type[BudgetNarrative],
+        response_model: type[_GeminiOutput],
         *,
         system_instruction: str | None = None,
         temperature: float | None = None,
         max_output_tokens: int | None = None,
-    ) -> BudgetNarrative: ...
+    ) -> _GeminiOutput: ...
 
 
 @dataclass(frozen=True)
@@ -99,6 +104,7 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
         self._cost_estimation_service = cost_estimation_service or CostEstimationService(self._settings)
 
     async def run(self, context: AgentContext) -> AgentResult[BudgetBreakdown]:
+        started = perf_counter()
         requirements = context.normalized_requirements or _from_request(context.request)
         currency = _normalize_currency(requirements.currency)
         budget = _as_decimal(requirements.total_budget)
@@ -127,6 +133,7 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
         entries: list[_BudgetEntry] = []
         automatic_items = {}
         missing_actions: list[str] = []
+        ai_refresh_categories = []
 
         try:
             accommodation_plan = _parse_accommodation_plan(
@@ -365,18 +372,49 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
                 )
 
             # Verified provider prices, then supported references, then supplied allowances.
-            automatic_items, estimate_warnings, missing_actions = await self._cost_estimation_service.estimate_missing(
-                requirements, context.destination_research, accommodation_plan,
-                [entry.item.category for entry in entries if entry.item.evidence_kind != "verified_price"
-                 and entry.item.category in _REQUIRED_CATEGORIES
-                 and not (entry.item.category == "accommodation" and _hotel_nights(requirements) == 0)],
-            )
+            if context.budget_revision is not None:
+                from ..services.budget_revision_service import revised_entries, ai_rates_requiring_refresh
+                entries, automatic_items, missing_actions = revised_entries(context, entries)
+                estimate_warnings = [
+                    "Budget revision reuses the original pricing snapshot; missing mandatory prices remain unknown."
+                ]
+                ai_refresh_categories = [category for category in ai_rates_requiring_refresh(context)
+                                         if any(entry.item.category == category and entry.item.amount is None for entry in entries)]
+                if ai_refresh_categories:
+                    fresh, fresh_warnings, fresh_actions = await self._cost_estimation_service.estimate_missing(
+                        requirements, context.destination_research, accommodation_plan, ai_refresh_categories)
+                    automatic_items.update(fresh)
+                    estimate_warnings.extend(fresh_warnings)
+                    estimate_warnings.append("Rate-relevant trip scope changed; prior AI assumptions were invalidated for " + ", ".join(ai_refresh_categories) + ". Fresh pricing is scoped to the current trip, not its budget.")
+                    missing_actions.extend(fresh_actions)
+            else:
+                automatic_items, estimate_warnings, missing_actions = await self._cost_estimation_service.estimate_missing(
+                    requirements, context.destination_research, accommodation_plan,
+                    [entry.item.category for entry in entries if entry.item.evidence_kind != "verified_price"
+                     and entry.item.category in _REQUIRED_CATEGORIES
+                     and not (entry.item.category == "accommodation" and _hotel_nights(requirements) == 0)],
+                )
+            for category, item in list(automatic_items.items()):
+                if invalid_cached_flight_line(item, requirements):
+                    del automatic_items[category]
+                    missing_actions.append("intercity_transport: obtain an applicable exact-date fare with validated passenger basis or supply a flight allowance.")
+                    estimate_warnings.append("An inapplicable cached flight reference was excluded from the budget.")
             warnings.extend(estimate_warnings)
             entries = [
                 _BudgetEntry(automatic_items[entry.item.category], True)
                 if entry.item.category in automatic_items else entry
                 for entry in entries
             ]
+            if self._settings.AI_COST_ESTIMATION_ENABLED and (context.budget_revision is None or ai_refresh_categories):
+                entries, ai_items, ai_warnings = await self._fill_ai_costs(
+                    context, requirements, accommodation_plan, entries, currency, started,
+                    allowed_categories=ai_refresh_categories if context.budget_revision is not None else None)
+                automatic_items.update(ai_items)
+                warnings.extend(ai_warnings)
+            # Retained AI lines remain planning estimates for reserve/range
+            # arithmetic; this does not request new rates or revise any cost.
+            automatic_items.update({entry.item.category: entry.item for entry in entries
+                                    if entry.item.ai_provenance is not None})
             resolved = {entry.item.category for entry in entries if entry.category_complete}
             missing_actions = [action for action in missing_actions if action.partition(":")[0] not in resolved]
             raw_contingency = raw_assumptions.get("contingency")
@@ -503,18 +541,20 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
         suggestions = _reduction_suggestions(
             entries, category_totals, target_currency, status
         )
-        narrative = await self._generate_narrative(
-            status,
-            budget,
-            known_subtotal,
-            target_currency,
-            category_totals,
-            warnings,
-            [item.model_dump(mode="json") for item in automatic_items.values()],
-        )
+        narrative = None
+        try:
+            # A slow commentary call must not erase retained costs after an AI
+            # fallback. The configured Gemini timeout itself remains unchanged.
+            remaining = self._settings.TRIP_AGENT_TIMEOUT_SECONDS - (perf_counter() - started)
+            async with asyncio.timeout(max(0, remaining / 3) if self._settings.AI_COST_ESTIMATION_ENABLED else None):
+                narrative = await self._generate_narrative(
+                    status, budget, known_subtotal, target_currency, category_totals, warnings,
+                    [item.model_dump(mode="json") for item in automatic_items.values()])
+        except TimeoutError:
+            warnings.append("Gemini budget commentary exceeded its remaining time allowance; deterministic costs were retained.")
 
         for entry in entries:
-            if entry.item.amount is not None and not entry.item.price_sources:
+            if entry.item.amount is not None and entry.item.ai_provenance is None and not entry.item.price_sources:
                 entry.item.price_sources = [PriceSource(name=reference.title, url=reference.url,
                     observed_on=date.today(), currency=entry.item.currency) for reference in entry.item.source_references] or [PriceSource(
                     name="User-provided planning allowance" if entry.item.source == "user_assumption" else "Configured planning assumption",
@@ -539,10 +579,16 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
             status=status,
             minimum_estimated_total=minimum_total,
             maximum_estimated_total=maximum_total,
-            estimate_confidence=("low" if any(item.confidence == "low" for item in automatic_items.values())
+            estimate_confidence=("low" if any(entry.item.ai_provenance is not None for entry in entries)
+                or any(item.confidence == "low" for item in automatic_items.values())
                 else "medium" if automatic_items and all(item.confidence in {"medium", "high"} for item in automatic_items.values())
                 else "unassessed"),
             missing_price_actions=missing_actions,
+            flight_references=(
+                BudgetBreakdown.model_validate(context.budget_breakdown).flight_references
+                if context.budget_revision is not None and context.budget_breakdown
+                else getattr(self._cost_estimation_service, "flight_references", [])
+            ),
             line_items=[entry.item for entry in entries],
             category_totals=category_totals,
             unpriced_components=unpriced,
@@ -566,6 +612,88 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
             warnings=warnings,
         )
 
+    async def _fill_ai_costs(self, context, requirements, plan, entries, currency, started, allowed_categories=None):
+        """Fill only unknown categories; existing numeric costs stay untouched."""
+        eligible = [entry.item.category for entry in entries
+                    if entry.item.category in _REQUIRED_CATEGORIES and not entry.category_complete
+                    and entry.item.amount is None]
+        if allowed_categories is not None:
+            eligible = [category for category in eligible if category in allowed_categories]
+        if not eligible:
+            return entries, {}, []
+        warnings = []
+        try:
+            scope_requirements = requirements.model_copy(update={"currency": currency})
+            if context.destination_research is not None:
+                research = DestinationResearch.model_validate(context.destination_research)
+                if research.resolution_status not in {None, "verified"} or len(research.city_segments) > 1:
+                    raise ValueError("AI requires a resolved single-destination pricing scope.")
+                if research.destination_name:
+                    scope_requirements = scope_requirements.model_copy(update={"destination": research.destination_name})
+            if plan is not None and plan.origin_resolution_status == "broad" and "intercity_transport" in eligible:
+                eligible.remove("intercity_transport")
+                warnings.append("AI intercity allowance was skipped: choose a specific departure city or airport; no origin was invented.")
+            if "activities" in eligible and (requirements.constraints.get("must_visit_attraction_ids")
+                or any(term in " ".join(requirements.interests).casefold() for term in ("theme park", "guided tour", "premium"))):
+                eligible.remove("activities")
+                warnings.append("AI activity allowance was skipped: required paid experiences need matching prices or an explicit user allowance.")
+            preferences = requirements.cost_preferences
+            occupancy = plan.accommodation.assumed_occupancy_per_room if plan else 2
+            rooms = preferences.room_count if preferences else None
+            if rooms is None and plan is not None:
+                rooms = plan.accommodation.room_count
+            inferred_rooms = rooms is None
+            if inferred_rooms and requirements.travelers_count is not None:
+                rooms = (requirements.travelers_count + occupancy - 1) // occupancy
+            if "accommodation" in eligible and rooms is not None and requirements.travelers_count is not None and rooms * occupancy < requirements.travelers_count:
+                eligible.remove("accommodation")
+                warnings.append("AI accommodation allowance was skipped: room capacity does not cover all travelers under the current occupancy assumption.")
+            if not eligible:
+                return entries, {}, warnings
+            request = AICostEstimationRequest.from_requirements(scope_requirements, room_count=rooms, missing_categories=eligible)
+            expected_scope = AICostScope.model_validate(request.model_dump(exclude={"missing_categories"}))
+            if requirements.travel_duration_days is not None and requirements.travel_duration_days != (request.end_date - request.start_date).days + 1:
+                raise ValueError("Trip-day counts disagree.")
+            remaining = self._settings.TRIP_AGENT_TIMEOUT_SECONDS - (perf_counter() - started)
+            deadline = min(self._settings.AI_COST_ESTIMATION_TIMEOUT_SECONDS,
+                           self._settings.TRIP_AGENT_TIMEOUT_SECONDS / 3, max(0, remaining / 3))
+            async with asyncio.timeout(deadline):
+                result = await self._cost_estimation_service.estimate_ai_assumptions(
+                    request, existing_costs=[entry.item for entry in entries if entry.category_complete],
+                    gemini_service=self._gemini_service, remaining_agent_seconds=max(0, remaining))
+            result = AICostEstimationResult.model_validate(result.model_dump(mode="python"))
+            warnings.extend(result.warnings)
+            accepted = {}
+            for category, estimate in result.estimates.items():
+                provenance = estimate.provenance
+                if (category not in eligible or estimate.line_item.category != category
+                    or provenance is None or provenance.scope != expected_scope):
+                    warnings.append("An AI cost lacked matching requested scope or category evidence and was excluded.")
+                    continue
+                raw = estimate.line_item.model_dump(mode="python")
+                raw["ai_provenance"] = provenance.model_dump(mode="json")
+                item = BudgetLineItem.model_validate(raw)
+                if inferred_rooms and category == "accommodation":
+                    item.assumptions.append(f"Python assumed {occupancy} travelers per room and calculated {rooms} rooms; occupancy was not provider-verified.")
+                accepted[category] = item
+            updated = [_BudgetEntry(accepted[entry.item.category], True)
+                       if entry.item.category in accepted and entry.item.amount is None and not entry.category_complete else entry
+                       for entry in entries]
+            if accepted:
+                warnings.append("Budget includes low-confidence AI-generated planning assumptions; fares, hotel availability and ticket prices are not live-verified.")
+            return updated, accepted, warnings
+        except asyncio.CancelledError:
+            raise
+        except TimeoutError:
+            warnings.append("AI cost estimation exceeded its bounded deadline; valid costs were retained and unresolved categories remain unknown.")
+        except Exception as error:
+            warnings.append("AI cost estimation was unavailable or its trip scope was invalid: " + safe_failure_reason(error) + ". Valid costs were retained.")
+        return entries, {}, warnings
+
+    async def propose_budget_revision(self, context: AgentContext) -> dict | None:
+        from ..services.budget_revision_service import propose_revision
+        return await propose_revision(context, self._cost_estimation_service)
+
     async def _generate_narrative(
         self,
         status: BudgetStatus,
@@ -583,16 +711,12 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
         prompt = json.dumps(
             {
                 "deterministic_status": status,
-                "budget": str(budget) if budget is not None else None,
-                "known_cost_subtotal": (
-                    str(known_subtotal) if known_subtotal is not None else None
-                ),
+                "user_budget_present": budget is not None,
                 "currency": currency,
-                "planning_allowances_and_sources": estimation_details or [],
+                "includes_ai_assumptions": any(item.get("ai_provenance") is not None for item in estimation_details or []),
                 "category_totals": [
                     {
                         "category": item.category,
-                        "known_subtotal": str(item.known_subtotal),
                         "complete": item.complete,
                     }
                     for item in category_totals
@@ -619,10 +743,16 @@ class BudgetAgent(BaseAgent[BudgetBreakdown]):
                         max_output_tokens=500,
                     )
             validated = BudgetNarrative.model_validate(narrative)
-            if not _qualitative_only(validated):
+            included = [row for row in category_totals if row.included]
+            complete = bool(included) and all(row.complete for row in included)
+            text = " ".join([validated.summary, *validated.tradeoffs])
+            contradictory = complete and bool(re.search(
+                r"(?:budget|estimate|total|cost)(?:\s+\w+){0,5}\s+(?:incomplete|missing)|"
+                r"missing (?:mandatory|required|essential) (?:costs?|prices?|inputs?)", text, re.IGNORECASE))
+            if contradictory or not _qualitative_only(validated):
                 warnings.append(
                     "Gemini budget commentary was discarded because it contained "
-                    "unsupported monetary or affordability claims."
+                    "unsupported monetary or affordability claims, or contradicted deterministic cost completeness."
                 )
                 return None
             return validated

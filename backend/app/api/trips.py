@@ -14,6 +14,7 @@ from ..schemas.trip_api import (
     TripDetailsResponse,
     TripListResponse,
     TripPlanRequest,
+    TripRevisionRequest,
     TripStatusResponse,
 )
 from ..services.task_status_service import TaskStatusService
@@ -22,6 +23,8 @@ from ..services.trip_planning_service import (
     TripPersistenceError,
     TripPlanningService,
 )
+
+from ..services.interactive_budget_revision import RevisionConflict
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/trips", tags=["trips"])
@@ -81,6 +84,44 @@ def get_history_trip_planning_service(request: Request) -> TripPlanningService:
 HistoryTripService = Annotated[
     TripPlanningService, Depends(get_history_trip_planning_service)
 ]
+
+
+def get_revision_trip_service(request: Request) -> TripPlanningService:
+    # There is no authenticated user/ownership model in this application yet.
+    # Fail closed in production; UUID knowledge is never mutation authority.
+    local = {"localhost", "127.0.0.1", "::1"}
+    allowed_origins = {f"http://{host}:{port}" for host in ("localhost", "127.0.0.1") for port in (5173, 5174)}
+    if (request.app.state.settings.APP_ENV != "development"
+        or request.client is None or request.client.host not in local
+        or request.url.hostname not in local
+        or request.headers.get("origin") not in allowed_origins
+        or request.headers.get("x-trip-revision") != "1"):
+        raise HTTPException(status_code=403, detail={"code": "revision_access_denied",
+            "message": "Trip revision is restricted to the local development application. Authenticated trip ownership is required before production use."})
+    return get_trip_planning_service(request)
+
+
+@router.post("/{trip_id}/revise", response_model=TripCreatedResponse, status_code=202,
+             summary="Queue a snapshot-based budget revision (local development only)")
+async def revise_trip_plan(trip_id: UUID, payload: TripRevisionRequest, background_tasks: BackgroundTasks,
+                           request: Request, service: Annotated[TripPlanningService, Depends(get_revision_trip_service)]):
+    try:
+        original = await service.revise_trip(trip_id, allow_economy_accommodation=payload.allow_economy_accommodation)
+    except TripNotFoundError as exc:
+        await service.aclose()
+        raise HTTPException(status_code=404, detail={"code": "trip_not_found", "message": "Trip was not found."}) from exc
+    except (RevisionConflict, ValueError) as exc:
+        await service.aclose()
+        message = str(exc) if isinstance(exc, RevisionConflict) else "Saved trip data is invalid; no revision was queued."
+        raise HTTPException(status_code=409, detail={"code": "revision_not_eligible", "message": message}) from exc
+    except TripPersistenceError as exc:
+        await service.aclose()
+        raise HTTPException(status_code=503, detail={"code": "revision_unavailable", "message": "The budget revision could not be queued."}) from exc
+    if request.app.state.settings.TRIP_EXECUTION_MODE == "database_worker":
+        await service.aclose()
+    else:
+        background_tasks.add_task(_run_and_close, service, trip_id, original.model_dump(mode="json"))
+    return TripCreatedResponse(trip_id=trip_id, task_id=trip_id, status="queued", message="Optimizing your travel plan using supported costs and your original budget.")
 
 
 @router.post(

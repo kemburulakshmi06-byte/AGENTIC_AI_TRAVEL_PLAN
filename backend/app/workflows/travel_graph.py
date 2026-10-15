@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import re
 import time
 from dataclasses import dataclass
@@ -19,6 +20,8 @@ from ..schemas.agent_schemas import (
     TravelRequest,
 )
 from ..schemas.budget import BudgetBreakdown
+from ..schemas.flight_pricing import invalid_cached_flight_line
+from ..services.ai_cost_safety import ai_budget_issue
 from ..schemas.destination_research import DestinationResearch, SourceReference
 from ..schemas.itinerary import TripItinerary
 from ..schemas.optimization import OptimizationReview
@@ -95,6 +98,7 @@ def build_travel_graph(
     agents: TravelAgentSet,
     *,
     max_revisions: int = 2,
+    revision_entry: bool = False,
 ) -> Any:
     """Build the compiled async LangGraph state machine."""
     if max_revisions < 0:
@@ -156,8 +160,9 @@ def build_travel_graph(
         ),
     )
     graph.add_node("revision", _revision_node)
+    graph.add_node("budget_revision", _budget_revision_node(agents.budget))
 
-    graph.add_edge(START, "requirements")
+    graph.add_edge(START, "budget_revision" if revision_entry else "requirements")
     graph.add_conditional_edges(
         "requirements",
         _continue_or_stop("destination_research"),
@@ -186,12 +191,15 @@ def build_travel_graph(
     graph.add_conditional_edges(
         "optimization_review",
         _after_review,
-        {"revision": "revision", END: END},
+        {"revision": "revision", "budget_revision": "budget_revision", END: END},
     )
     graph.add_conditional_edges(
         "revision",
         _after_revision,
         {"budget": "budget", "itinerary": "itinerary", END: END},
+    )
+    graph.add_conditional_edges(
+        "budget_revision", _after_revision, {"budget": "budget", "itinerary": "itinerary", END: END},
     )
     return graph.compile()
 
@@ -330,7 +338,12 @@ def _agent_node(
                 )
             if safety_warning:
                 execution_status = safe_status
-                error_messages.append(safety_warning)
+                # Recoverable review findings belong to the review snapshot.
+                # Persist an error only when no budget revision will be tried.
+                if _after_review({**state, "execution_status": safe_status}) != "budget_revision":
+                    error_messages.append(safety_warning)
+                if state.get("revision_count", 0) >= state.get("max_revisions", 2):
+                    error_messages.append("The configured revision limit has been reached; unresolved prices or costs require user input.")
             elif review.approved:
                 execution_status = "COMPLETED"
             elif review.review_status == "INSUFFICIENT_DATA":
@@ -423,6 +436,7 @@ def _build_context(state: TravelWorkflowState) -> AgentContext:
         accommodation_transport_plan=json_dict("accommodation_transport_plan"),
         budget_breakdown=json_dict("budget_breakdown"),
         trip_itinerary=json_dict("trip_itinerary"),
+        budget_revision=state.get("budget_revision"),
     )
 
 
@@ -438,9 +452,68 @@ def _continue_or_stop(next_stage: str):
 
 
 def _after_review(state: TravelWorkflowState) -> str:
+    if state.get("revision_count", 0) >= state.get("max_revisions", 2):
+        return END
+    budget = state.get("budget_breakdown")
+    if (state.get("execution_status") in {"RUNNING", "REVISION_REQUIRED", "INSUFFICIENT_DATA"}
+        and budget is not None and budget.status != "INVALID_INPUT"
+        and budget.known_cost_subtotal is not None and budget.total_budget is not None
+        and budget.known_cost_subtotal > budget.total_budget):
+        return "budget_revision"
     if state.get("execution_status") != "RUNNING":
         return END
     return "revision"
+
+
+def _budget_revision_node(budget_agent):
+    async def revise(state):
+        budget = state["budget_breakdown"]
+        safe_status, safety_warning = _budget_safety_status(state)
+        unresolved = "INSUFFICIENT_DATA" if safe_status == "INSUFFICIENT_DATA" else "REVISION_REQUIRED"
+        actions = list(budget.missing_price_actions) or [
+            f"Provide a supported price or allowance for {component}." for component in budget.unpriced_components
+        ]
+        requirements = state.get("normalized_requirements")
+        if requirements:
+            constraints = [key for key, value in requirements.constraints.items()
+                           if value and key not in {"budget_assumptions", "excluded_attraction_ids"}]
+            if constraints:
+                actions.append("Confirm cheaper alternatives satisfy these constraints: " + ", ".join(sorted(constraints)) + ".")
+        if state["request"].user_message:
+            actions.append("Confirm whether the free-text preferences permit an economy accommodation or meal alternative.")
+        terminal = {
+            "current_stage": "budget_revision", "execution_status": unresolved,
+            "budget_inputs_changed": False,
+            "errors": [safety_warning or "Supported cost reductions are unavailable; the review remains unresolved.", *actions],
+            "warnings": ["No further supported cost reduction is available for the permitted choices. Obtain an applicable lower fare, confirm compatible lower-cost references, or approve a preference change; the original budget and AI unit rates remain unchanged.", *actions],
+        }
+        if state.get("revision_count", 0) >= state.get("max_revisions", 2):
+            return {**terminal, "warnings": ["The configured revision limit has been reached.", *actions]}
+        propose = getattr(budget_agent, "propose_budget_revision", None)
+        if not callable(propose):
+            return terminal
+        try:
+            async with asyncio.timeout(state.get("agent_timeout_seconds", 60)):
+                directive = await propose(_build_context(state))
+            fingerprint = json.dumps(directive, sort_keys=True) if directive else None
+            from ..services.budget_revision_service import revised_plan
+            plan_update = revised_plan(_build_context(state), directive) if directive else None
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            return {**terminal, "warnings": ["Budget alternatives could not be validated; no unsupported changes were applied.", *actions]}
+        previous = state.get("budget_revision_fingerprints", [])
+        if not directive or fingerprint in previous:
+            return terminal
+        return {
+            "current_stage": "budget_revision", "execution_status": "RUNNING",
+            "budget_revision": directive, "budget_inputs_changed": True,
+            "revision_count": state.get("revision_count", 0) + 1,
+            "budget_revision_fingerprints": [*previous, fingerprint],
+            **({"accommodation_transport_plan": plan_update} if plan_update is not None else {}),
+            "warnings": ["Applied supported budget alternatives; Budget, Itinerary and Optimization will rerun. Missing mandatory prices still block approval."],
+        }
+    return revise
 
 
 def _budget_safety_status(
@@ -453,8 +526,14 @@ def _budget_safety_status(
             "INSUFFICIENT_DATA",
             "Budget or normalized requirements are missing; affordability cannot be approved.",
         )
+    ai_issue = ai_budget_issue(budget, requirements, state.get("destination_research"),
+                               state.get("accommodation_transport_plan"), state["request"])
+    if ai_issue or budget.booking_readiness != "unverified":
+        return ("INSUFFICIENT_DATA", "AI cost evidence or booking readiness is invalid for the requested trip; planning approval was blocked.")
     if (
         budget.status in {"INCOMPLETE_ESTIMATE", "INVALID_INPUT"}
+        or any(invalid_cached_flight_line(item, state["request"])
+               or invalid_cached_flight_line(item, requirements) for item in budget.line_items)
         or budget.estimated_total is None
         or budget.total_budget is None
         or budget.known_cost_subtotal is None
@@ -731,6 +810,7 @@ async def plan_trip(
     timeout_seconds: float = 180.0,
     agent_timeout_seconds: float = 60.0,
     on_state=None,
+    revision_snapshot: dict | None = None,
 ) -> TravelWorkflowState:
     """Run the planning workflow asynchronously and return its final state."""
     if max_revisions < 0:
@@ -757,18 +837,32 @@ async def plan_trip(
         "excluded_attraction_ids": [],
         "revision_directive": None,
         "budget_inputs_changed": False,
+        "budget_revision": None,
+        "budget_revision_fingerprints": [],
     }
+    if revision_snapshot is not None:
+        # Only trusted server-persisted snapshots enter this path, never request JSON.
+        for field, model in (("normalized_requirements", NormalizedTravelRequirements),
+                             ("destination_research", DestinationResearch),
+                             ("accommodation_transport_plan", AccommodationTransportPlan),
+                             ("budget_breakdown", BudgetBreakdown), ("trip_itinerary", TripItinerary),
+                             ("optimization_review", OptimizationReview)):
+            initial[field] = model.model_validate(revision_snapshot[field])
+        initial["agent_history"] = [AgentExecutionRecord.model_validate(row) for row in revision_snapshot.get("agent_history", [])]
+        initial["budget_revision"] = revision_snapshot.get("budget_revision")
+        initial["current_stage"] = "budget_revision"
     result = initial
     try:
         graph = build_travel_graph(
             resolved_agents,
             max_revisions=max_revisions,
+            revision_entry=revision_snapshot is not None,
         )
         async with asyncio.timeout(timeout_seconds):
             # Retain every completed stage if a later node or provider fails.
-            async for snapshot in graph.astream(initial, stream_mode="values"):
+            async for snapshot in graph.astream(initial, stream_mode="values", config={"recursion_limit": 16 + 4 * max_revisions}):
                 result = cast(TravelWorkflowState, snapshot)
-                if on_state is not None and result.get("agent_history"):
+                if on_state is not None and (result.get("agent_history") or revision_snapshot is not None):
                     await on_state(result)
     except asyncio.CancelledError:
         raise
